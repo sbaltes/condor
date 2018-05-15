@@ -9,11 +9,11 @@ from Stack Overflow posts or comments using a heuristic based on domains and pat
 
 Windows:
 
-    mvn exec:java -D"exec.mainClass"="org.sotorrent.linkclassification.Main" -D"exec.args"="-l input/java_regex_q90_domains.csv -p input/java_regex_posts_q90_domains.csv -c input/java_regex_comments_q90_domains.csv -o output"
+    mvn exec:java -D"exec.mainClass"="org.sotorrent.linkclassification.Main" -D"exec.args"="-l data-collection/data/java_regex_q90_domains.csv -p data-collection/data/java_regex_posts_q90_domains.csv -c data-collection/data/java_regex_comments_q90_domains.csv -o output"
 
 Linux/macOS:
 
-    mvn exec:java -Dexec.mainClass="org.sotorrent.linkclassification.Main" -Dexec.args="-l input/java_regex_q90_domains.csv -p input/java_regex_posts_q90_domains.csv -c input/java_regex_comments_q90_domains.csv -o output"
+    mvn exec:java -Dexec.mainClass="org.sotorrent.linkclassification.Main" -Dexec.args="-l data-collection/data/java_regex_q90_domains.csv -p data-collection/data/java_regex_posts_q90_domains.csv -c data-collection/data/java_regex_comments_q90_domains.csv -o output"
 
 #### Parameters
 

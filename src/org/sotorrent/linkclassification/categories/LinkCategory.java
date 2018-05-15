@@ -26,7 +26,7 @@ public abstract class LinkCategory {
     static {
         // configure CSV format for domain categories
         csvFormatLinkCategory = CSVFormat.DEFAULT
-                .withHeader("CompleteDomain", "LinkCategory")
+                .withHeader("CompleteDomain", "PostCount", "LinkCategory")
                 .withDelimiter(',')
                 .withQuote('"')
                 .withQuoteMode(QuoteMode.MINIMAL)
