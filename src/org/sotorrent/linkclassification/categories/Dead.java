@@ -37,13 +37,13 @@ public class Dead extends LinkCategory {
         try {
             URL url = new URL(link.getUrl());
             if (link.getProtocol().equals("http")) {
-                HttpURLConnection.setFollowRedirects(false);
+                HttpURLConnection.setFollowRedirects(false); // TODO: What about sites like sun.java.com?
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("HEAD");
                 conn.connect();
                 return (conn.getResponseCode() != HttpURLConnection.HTTP_OK);
             } else if (link.getProtocol().equals("https")) {
-                HttpsURLConnection.setFollowRedirects(false);
+                HttpsURLConnection.setFollowRedirects(false); // TODO: What about sites like sun.java.com?
                 HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
                 conn.setRequestMethod("HEAD");
                 conn.connect();
