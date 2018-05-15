@@ -8,6 +8,10 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Random;
 
+/**
+ * Category for dead links.
+ * Can also be used to search for dead links (method isDead).
+ */
 public class Dead extends LinkCategory {
     private static Random rand = new Random();
 

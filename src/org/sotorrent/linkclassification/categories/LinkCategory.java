@@ -14,6 +14,10 @@ import java.util.List;
 
 import static org.sotorrent.linkclassification.Main.logger;
 
+/**
+ * Superclass for link categories.
+ * Each link category implements the singleton design pattern.
+ */
 public abstract class LinkCategory {
     private List<String> completeDomains;
     private List<Link> links;
@@ -61,6 +65,7 @@ public abstract class LinkCategory {
     }
 
     public static void readFromCSV(Path pathToCSVFile) {
+        // store references to link category singleton instances
         LinkCategory complex = Complex.getInstance();
         LinkCategory dead = Dead.getInstance();
         LinkCategory forum = Forum.getInstance();
@@ -70,6 +75,7 @@ public abstract class LinkCategory {
         LinkCategory otherDocumentation = OtherDocumentation.getInstance();
         LinkCategory unknown = Unknown.getInstance();
 
+        // parse assigned link categories (default category is Unknown)
         try (CSVParser csvParser = new CSVParser(new FileReader(pathToCSVFile.toFile()), csvFormatLinkCategory)) {
             logger.info("Reading link categorization from CSV file " + pathToCSVFile.toFile().toString() + " ...");
 

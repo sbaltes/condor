@@ -2,6 +2,10 @@ package org.sotorrent.linkclassification.links;
 
 import org.sotorrent.linkclassification.categories.*;
 
+/**
+ * Abstract superclass for post and comment links.
+ * Enables classification of links (see method classify).
+ */
 public abstract class Link {
     int postId;
     int postTypeId;
@@ -36,6 +40,7 @@ public abstract class Link {
     }
 
     public void classify(boolean searchForDeadLinks) {
+        // store references to link category singleton objects
         Complex complex = Complex.getInstance();
         LinkCategory dead = Dead.getInstance();
         LinkCategory forum = Forum.getInstance();
@@ -45,6 +50,7 @@ public abstract class Link {
         LinkCategory otherDocumentation = OtherDocumentation.getInstance();
         LinkCategory unknown = Unknown.getInstance();
 
+        // first check if link domain is marked as dead, optionally validate link
         if (dead.match(this) || (searchForDeadLinks && Dead.isDead(this))) {
             this.category = dead;
             this.category.addLink(this);

@@ -8,6 +8,9 @@ import java.util.stream.Collectors;
 
 import static org.sotorrent.linkclassification.Main.logger;
 
+/**
+ * This link category is used for complex domains with different categories for different URL paths.
+ */
 public class Complex extends LinkCategory {
     private static final class InstanceClass {
         static final Complex INSTANCE = new Complex();

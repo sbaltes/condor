@@ -1,5 +1,8 @@
 package org.sotorrent.linkclassification.categories;
 
+/**
+ * Category for links to non-documentation resources.
+ */
 public class NotDocumentation extends LinkCategory {
     private static final class InstanceClass {
         static final NotDocumentation INSTANCE = new NotDocumentation();

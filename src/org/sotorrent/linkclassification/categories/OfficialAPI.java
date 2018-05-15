@@ -1,5 +1,8 @@
 package org.sotorrent.linkclassification.categories;
 
+/**
+ * Category for links to official API documentation.
+ */
 public class OfficialAPI extends LinkCategory {
     private static final class InstanceClass {
         static final OfficialAPI INSTANCE = new OfficialAPI();

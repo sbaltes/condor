@@ -14,6 +14,9 @@ import java.util.List;
 
 import static org.sotorrent.linkclassification.Main.logger;
 
+/**
+ * Class to parse and write SO post links from/to CSV files.
+ */
 public class PostLink extends Link {
     private int postHistoryId;
 
