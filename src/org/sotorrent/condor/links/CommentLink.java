@@ -1,4 +1,4 @@
-package org.sotorrent.linkclassification.links;
+package org.sotorrent.condor.links;
 
 import de.unitrier.st.util.Util;
 import org.apache.commons.csv.*;
@@ -12,20 +12,21 @@ import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
 
-import static org.sotorrent.linkclassification.Main.logger;
+import static org.sotorrent.condor.MatchDeveloperResources.logger;
 
 /**
  * Class to parse and write SO comment links from/to CSV files.
  */
 public class CommentLink extends Link {
+    private int postId;
+    private int postTypeId;
     private int commentId;
 
-    private static final CSVFormat csvFormatCommentLink;
-    private static final CSVFormat csvFormatClassifiedCommentLink;
+    private static final CSVFormat csvFormatCommentLink, csvFormatClassifiedCommentLink;
     static {
         // configure CSV format for comment links
         csvFormatCommentLink = CSVFormat.DEFAULT
-                .withHeader("PostId", "PostTypeId", "CommentId", "Protocol", "RootDomain", "CompleteDomain", "Path", "Url")
+                .withHeader("PostId", "PostTypeId", "CommentId", "Url")
                 .withDelimiter(',')
                 .withQuote('"')
                 .withQuoteMode(QuoteMode.MINIMAL)
@@ -33,7 +34,7 @@ public class CommentLink extends Link {
                 .withFirstRecordAsHeader();
         // configure CSV format for classified comment links
         csvFormatClassifiedCommentLink = CSVFormat.DEFAULT
-                .withHeader("PostId", "PostTypeId", "CommentId", "LinkCategory", "Protocol", "RootDomain", "CompleteDomain", "Path", "Url")
+                .withHeader("PostId", "PostTypeId", "CommentId", "Protocol", "RootDomain", "CompleteDomain", "Path", "Url", "MatchedDeveloperResource")
                 .withDelimiter(',')
                 .withQuote('"')
                 .withQuoteMode(QuoteMode.MINIMAL)
@@ -42,12 +43,14 @@ public class CommentLink extends Link {
 
     private CommentLink(int postId, int postTypeId, int commentId,
                         String protocol, String rootDomain, String completeDomain, String path, String url) {
-        super(postId, postTypeId, protocol, rootDomain, completeDomain, path, url);
+        super(protocol, rootDomain, completeDomain, path, url);
+        this.postId = postId;
+        this.postTypeId = postTypeId;
         this.commentId = commentId;
     }
 
-    public static List<CommentLink> readFromCSV(Path pathToCSVFile) {
-        List<CommentLink> commentLinks = new LinkedList<>();
+    public static List<Link> readFromCSV(Path pathToCSVFile) {
+        List<Link> commentLinks = new LinkedList<>();
 
         try (CSVParser csvParser = new CSVParser(new FileReader(pathToCSVFile.toFile()), csvFormatCommentLink)) {
             logger.info("Reading comment links from CSV file " + pathToCSVFile.toFile().toString() + " ...");
@@ -69,10 +72,10 @@ public class CommentLink extends Link {
             e.printStackTrace();
         }
 
-        return  commentLinks;
+        return commentLinks;
     }
 
-    public static void writeToCSV(List<CommentLink> commentLinks, Path outputDir) {
+    public static void writeToCSV(List<Link> commentLinks, Path outputDir) {
         Util.ensureDirectoryExists(outputDir);
 
         File outputFile = Paths.get(outputDir.toString(), "CommentLinks.csv").toFile();
@@ -82,14 +85,15 @@ public class CommentLink extends Link {
             }
         }
 
-        logger.info("Writing classified comment links to CSV file " + outputFile.getName() + " ...");
+        logger.info("Writing comment links to CSV file " + outputFile.getName() + " ...");
         try (CSVPrinter csvPrinter = new CSVPrinter(new FileWriter(outputFile), csvFormatClassifiedCommentLink)) {
             // header is automatically written
-            for (CommentLink commentLink : commentLinks) {
+            for (Link link : commentLinks) {
+                CommentLink commentLink = (CommentLink) link;
                 csvPrinter.printRecord(commentLink.postId, commentLink.postTypeId, commentLink.commentId,
-                        commentLink.category.getClass().getSimpleName(),
-                        commentLink.protocol, commentLink.rootDomain,
-                        commentLink.completeDomain, commentLink.path, commentLink.url
+                        commentLink.protocol, commentLink.rootDomain, commentLink.completeDomain,
+                        commentLink.path, commentLink.url,
+                        commentLink.matchedDeveloperResource
                 );
             }
         } catch (IOException e) {

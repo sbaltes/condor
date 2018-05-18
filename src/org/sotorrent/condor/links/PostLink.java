@@ -1,4 +1,4 @@
-package org.sotorrent.linkclassification.links;
+package org.sotorrent.condor.links;
 
 import de.unitrier.st.util.Util;
 import org.apache.commons.csv.*;
@@ -12,20 +12,21 @@ import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
 
-import static org.sotorrent.linkclassification.Main.logger;
+import static org.sotorrent.condor.MatchDeveloperResources.logger;
 
 /**
  * Class to parse and write SO post links from/to CSV files.
  */
 public class PostLink extends Link {
+    private int postId;
+    private int postTypeId;
     private int postHistoryId;
 
-    private static final CSVFormat csvFormatPostLink;
-    private static final CSVFormat csvFormatClassifiedPostLink;
+    private static final CSVFormat csvFormatPostLink, csvFormatClassifiedPostLink;
     static {
         // configure CSV format for post links
         csvFormatPostLink = CSVFormat.DEFAULT
-                .withHeader("PostId", "PostTypeId", "PostHistoryId", "Protocol", "RootDomain", "CompleteDomain", "Path", "Url")
+                .withHeader("PostId", "PostTypeId", "PostHistoryId", "Url")
                 .withDelimiter(',')
                 .withQuote('"')
                 .withQuoteMode(QuoteMode.MINIMAL)
@@ -34,7 +35,7 @@ public class PostLink extends Link {
 
         // configure CSV format for classified post links
         csvFormatClassifiedPostLink = CSVFormat.DEFAULT
-                .withHeader("PostId", "PostTypeId", "PostHistoryId", "LinkCategory", "Protocol", "RootDomain", "CompleteDomain", "Path", "Url")
+                .withHeader("PostId", "PostTypeId", "PostHistoryId", "Protocol", "RootDomain", "CompleteDomain", "Path", "Url", "MatchedDeveloperResource")
                 .withDelimiter(',')
                 .withQuote('"')
                 .withQuoteMode(QuoteMode.MINIMAL)
@@ -43,12 +44,14 @@ public class PostLink extends Link {
 
     private PostLink(int postId, int postTypeId, int postHistoryId,
                      String protocol, String rootDomain, String completeDomain, String path, String url) {
-        super(postId, postTypeId, protocol, rootDomain, completeDomain, path, url);
+        super(protocol, rootDomain, completeDomain, path, url);
+        this.postId = postId;
+        this.postTypeId = postTypeId;
         this.postHistoryId = postHistoryId;
     }
 
-    public static List<PostLink> readFromCSV(Path pathToCSVFile) {
-        List<PostLink> postLinks = new LinkedList<>();
+    public static List<Link> readFromCSV(Path pathToCSVFile) {
+        List<Link> postLinks = new LinkedList<>();
 
         try (CSVParser csvParser = new CSVParser(new FileReader(pathToCSVFile.toFile()), csvFormatPostLink)) {
             logger.info("Reading post links from CSV file " + pathToCSVFile.toFile().toString() + " ...");
@@ -70,10 +73,10 @@ public class PostLink extends Link {
             e.printStackTrace();
         }
 
-        return  postLinks;
+        return postLinks;
     }
 
-    public static void writeToCSV(List<PostLink> postLinks, Path outputDir) {
+    public static void writeToCSV(List<Link> postLinks, Path outputDir) {
         Util.ensureDirectoryExists(outputDir);
 
         File outputFile = Paths.get(outputDir.toString(), "PostsLinks.csv").toFile();
@@ -83,13 +86,14 @@ public class PostLink extends Link {
             }
         }
 
-        logger.info("Writing classified post links to CSV file " + outputFile.getName() + " ...");
+        logger.info("Writing post links to CSV file " + outputFile.getName() + " ...");
         try (CSVPrinter csvPrinter = new CSVPrinter(new FileWriter(outputFile), csvFormatClassifiedPostLink)) {
             // header is automatically written
-            for (PostLink postLink : postLinks) {
+            for (Link link : postLinks) {
+                PostLink postLink = (PostLink) link;
                 csvPrinter.printRecord(postLink.postId, postLink.postTypeId, postLink.postHistoryId,
-                        postLink.category.getClass().getSimpleName(),
-                        postLink.protocol, postLink.rootDomain, postLink.completeDomain, postLink.path, postLink.url
+                        postLink.protocol, postLink.rootDomain, postLink.completeDomain,
+                        postLink.path, postLink.url, postLink.matchedDeveloperResource
                 );
             }
         } catch (IOException e) {
