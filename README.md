@@ -8,6 +8,8 @@ using a heuristic based on domains and paths.
 
 #### Execute developer resource matcher from console
 
+    mvn clean install
+
 Windows:
 
     mvn exec:java -D"exec.mainClass"="org.sotorrent.condor.MatchDeveloperResources" -D"exec.args"="-p data-collection/data/java_regex_posts.csv -c data-collection/data/java_regex_comments.csv -o output"
@@ -25,6 +27,8 @@ Linux/macOS:
 `-o` Path to output directory.
 
 #### Execute link validation from console
+
+    mvn clean install
 
 Windows:
 
