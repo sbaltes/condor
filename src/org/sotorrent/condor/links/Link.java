@@ -81,21 +81,11 @@ public class Link {
     private Link resolvedLink;
 
     public Link(String url) {
-        setUrl(url);
-    }
-
-    Link(String protocol, String rootDomain, String completeDomain, String path, String url) {
-        this.protocol = protocol;
-        this.rootDomain = rootDomain;
-        this.completeDomain = completeDomain;
-        this.path = path;
-        this.url = url;
-
         this.matchedDeveloperResource = null;
-
         this.dead = false;
         this.resolved = false;
         this.resolvedLink = null;
+        setUrl(url);
     }
 
     public String getProtocol() {

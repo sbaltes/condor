@@ -41,9 +41,8 @@ public class CommentLink extends Link {
                 .withEscape('\\');
     }
 
-    private CommentLink(int postId, int postTypeId, int commentId,
-                        String protocol, String rootDomain, String completeDomain, String path, String url) {
-        super(protocol, rootDomain, completeDomain, path, url);
+    private CommentLink(int postId, int postTypeId, int commentId, String url) {
+        super(url);
         this.postId = postId;
         this.postTypeId = postTypeId;
         this.commentId = commentId;
@@ -59,14 +58,9 @@ public class CommentLink extends Link {
                 int postId = Integer.parseInt(currentRecord.get("PostId"));
                 int postTypeId = Integer.parseInt(currentRecord.get("PostTypeId"));
                 int commentId = Integer.parseInt(currentRecord.get("CommentId"));
-                String protocol = currentRecord.get("Protocol");
-                String rootDomain = currentRecord.get("RootDomain");
-                String completeDomain = currentRecord.get("CompleteDomain");
-                String path = currentRecord.get("Path");
                 String url = currentRecord.get("Url");
 
-                commentLinks.add(new CommentLink(postId, postTypeId, commentId,
-                        protocol, rootDomain, completeDomain, path, url));
+                commentLinks.add(new CommentLink(postId, postTypeId, commentId, url));
             }
         } catch (IOException e) {
             e.printStackTrace();

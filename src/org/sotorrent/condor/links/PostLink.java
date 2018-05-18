@@ -42,9 +42,8 @@ public class PostLink extends Link {
                 .withEscape('\\');
     }
 
-    private PostLink(int postId, int postTypeId, int postHistoryId,
-                     String protocol, String rootDomain, String completeDomain, String path, String url) {
-        super(protocol, rootDomain, completeDomain, path, url);
+    private PostLink(int postId, int postTypeId, int postHistoryId, String url) {
+        super(url);
         this.postId = postId;
         this.postTypeId = postTypeId;
         this.postHistoryId = postHistoryId;
@@ -60,14 +59,9 @@ public class PostLink extends Link {
                 int postId = Integer.parseInt(currentRecord.get("PostId"));
                 int postTypeId = Integer.parseInt(currentRecord.get("PostTypeId"));
                 int postHistoryId = Integer.parseInt(currentRecord.get("PostHistoryId"));
-                String protocol = currentRecord.get("Protocol");
-                String rootDomain = currentRecord.get("RootDomain");
-                String completeDomain = currentRecord.get("CompleteDomain");
-                String path = currentRecord.get("Path");
                 String url = currentRecord.get("Url");
 
-                postLinks.add(new PostLink(postId, postTypeId, postHistoryId,
-                        protocol, rootDomain, completeDomain, path, url));
+                postLinks.add(new PostLink(postId, postTypeId, postHistoryId, url));
             }
         } catch (IOException e) {
             e.printStackTrace();
