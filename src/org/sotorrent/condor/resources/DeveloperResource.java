@@ -1,5 +1,6 @@
 package org.sotorrent.condor.resources;
 
+import com.google.common.collect.Sets;
 import org.sotorrent.condor.links.Link;
 
 import java.util.*;
@@ -12,7 +13,7 @@ import java.util.stream.Collectors;
 abstract public class DeveloperResource {
     Set<String> rootDomains;
     private Pattern resourcePattern;
-    private List<Link> matchedLinks;
+    List<Link> matchedLinks;
 
     DeveloperResource() {
         matchedLinks = new LinkedList<>();
@@ -41,16 +42,16 @@ abstract public class DeveloperResource {
         return false;
     }
 
-    public static List<DeveloperResource> createResources() {
-        return Arrays.asList(
+    public int getMatchedLinkCount() {
+        return matchedLinks.size();
+    }
+
+    public static Set<DeveloperResource> createDeveloperResources() {
+        return Sets.newHashSet(
                 new StackOverflow(),
                 new JavaAPI(),
                 new JavaReference()
         );
-    }
-
-    public int getMatchedLinkCount() {
-        return matchedLinks.size();
     }
 
     @Override

@@ -6,12 +6,14 @@ import org.sotorrent.condor.links.CommentLink;
 import org.sotorrent.condor.links.Link;
 import org.sotorrent.condor.links.PostLink;
 import org.sotorrent.condor.resources.DeveloperResource;
+import org.sotorrent.condor.resources.NotMatched;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.logging.Logger;
 
 public class MatchDeveloperResources {
@@ -60,7 +62,8 @@ public class MatchDeveloperResources {
         Path commentLinksPath = Paths.get(commandLine.getOptionValue("comment-links"));
         Path outputDirPath = Paths.get(commandLine.getOptionValue("output-dir"));
 
-        List<DeveloperResource> developerResources = DeveloperResource.createResources();
+        Set<DeveloperResource> developerResources = DeveloperResource.createDeveloperResources();
+        NotMatched notMatched = new NotMatched(developerResources);
 
         logger.info("Reading post links...");
         List<Link> postLinks = PostLink.readFromCSV(postLinksPath);
@@ -85,6 +88,7 @@ public class MatchDeveloperResources {
                 matchedLinkCount++;
             }
         }
+        notMatched.mark(postLinks);
         logger.info("Analysis of post links finished.");
 
 
@@ -100,6 +104,7 @@ public class MatchDeveloperResources {
                 matchedLinkCount++;
             }
         }
+        notMatched.mark(commentLinks);
         logger.info("Analysis of comment links finished.");
 
         logger.info("Total: " + matchedLinkCount + " links matched.");
@@ -107,6 +112,7 @@ public class MatchDeveloperResources {
         for (DeveloperResource developerResource : developerResources) {
             logger.info(developerResource + ": " + developerResource.getMatchedLinkCount() + " links matched.");
         }
+        logger.info(notMatched + ": " + notMatched.getMatchedLinkCount() + " links not matched.");
 
         PostLink.writeToCSV(postLinks, outputDirPath);
         CommentLink.writeToCSV(commentLinks, outputDirPath);
