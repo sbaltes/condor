@@ -16,7 +16,7 @@ Windows:
 
 Linux/macOS:
 
-    mvn exec:java -Dexec.mainClass="org.sotorrent.condor.MatchDeveloperResources" -Dexec.args="-p data-collection/data/java_regex_posts.csv -c data-collection/data/java_regex_comments.csv -o output"
+    mvn exec:java -Dexec.mainClass="org.sotorrent.condor.MatchDeveloperResources" -Dexec.args="-p data-collection/data/java_regex_posts.csv -c data-collection/data/java_regex_comments.csv -o output" output.log 2>&1
 
 #### Parameters
 
@@ -36,7 +36,7 @@ Windows:
 
 Linux/macOS:
 
-    mvn exec:java -Dexec.mainClass="org.sotorrent.condor.ValidateLinks" -Dexec.args="-u data-collection/data/java_regex_unique_links.csv -o output"
+    mvn exec:java -Dexec.mainClass="org.sotorrent.condor.ValidateLinks" -Dexec.args="-u data-collection/data/java_regex_unique_links.csv -o output" output.log 2>&1
 
 #### Parameters
 
