@@ -1,9 +1,10 @@
 package org.sotorrent.condor.links;
 
 import com.google.gson.JsonParser;
-import de.unitrier.st.util.Http;
+import de.unitrier.st.util.FileUtils;
+import de.unitrier.st.util.HttpUtils;
 import de.unitrier.st.util.Patterns;
-import de.unitrier.st.util.Util;
+import de.unitrier.st.util.exceptions.RateLimitExceededException;
 import org.apache.commons.csv.*;
 import org.sotorrent.condor.resources.DeveloperResource;
 
@@ -136,7 +137,7 @@ public class Link {
         this.matchedDeveloperResource = matchedDeveloperResource;
     }
 
-    public boolean checkIfDead(boolean followRedirects) throws IOException, Http.RateLimitExceededException {
+    public boolean checkIfDead(boolean followRedirects) throws IOException, RateLimitExceededException {
         if (deadRootDomains.contains(rootDomain)) {
             this.dead = true;
             return true;
@@ -150,10 +151,10 @@ public class Link {
         }
 
         // check if link is dead
-        HttpURLConnection conn = Http.openHttpConnection(this.url, "GET", followRedirects, requestTimeout);
-        Http.checkRateLimitExceeded(conn);
+        HttpURLConnection conn = HttpUtils.openHttpConnection(this.url, "GET", followRedirects, requestTimeout);
+        HttpUtils.checkRateLimitExceeded(conn);
 
-        if (Http.isSuccess(conn) || Http.isRedirect(conn)) {
+        if (HttpUtils.isSuccess(conn) || HttpUtils.isRedirect(conn)) {
             this.dead = false;
             return false;
         }
@@ -162,7 +163,7 @@ public class Link {
         return true;
     }
 
-    public boolean resolveShortLink() throws IOException, Http.RateLimitExceededException {
+    public boolean resolveShortLink() throws IOException, RateLimitExceededException {
         if (!linkShorteningDomains.contains(rootDomain)) {
             return false;
         }
@@ -183,10 +184,10 @@ public class Link {
                         googlApiKey, this.url
                 );
 
-                HttpURLConnection conn = Http.openHttpConnection(apiUrl, "GET", true, requestTimeout);
-                Http.checkRateLimitExceeded(conn);
+                HttpURLConnection conn = HttpUtils.openHttpConnection(apiUrl, "GET", true, requestTimeout);
+                HttpUtils.checkRateLimitExceeded(conn);
 
-                if (Http.isSuccess(conn)) {
+                if (HttpUtils.isSuccess(conn)) {
                     String response = new BufferedReader(new InputStreamReader(conn.getInputStream()))
                             .lines()
                             .parallel()
@@ -202,10 +203,10 @@ public class Link {
                         bitlyAccessToken, this.url
                 );
 
-                HttpURLConnection conn = Http.openHttpConnection(apiUrl, "GET", true, requestTimeout);
-                Http.checkRateLimitExceeded(conn);
+                HttpURLConnection conn = HttpUtils.openHttpConnection(apiUrl, "GET", true, requestTimeout);
+                HttpUtils.checkRateLimitExceeded(conn);
 
-                if (Http.isSuccess(conn)) {
+                if (HttpUtils.isSuccess(conn)) {
                     String response = new BufferedReader(new InputStreamReader(conn.getInputStream()))
                             .lines()
                             .parallel()
@@ -221,10 +222,10 @@ public class Link {
             }
             case "t.co": {
                 // see https://developer.twitter.com/en/docs/basics/tco
-                HttpURLConnection conn = Http.openHttpConnection(this.url, "GET", false, requestTimeout);
-                Http.checkRateLimitExceeded(conn);
+                HttpURLConnection conn = HttpUtils.openHttpConnection(this.url, "GET", false, requestTimeout);
+                HttpUtils.checkRateLimitExceeded(conn);
 
-                if (Http.isSuccess(conn)) {
+                if (HttpUtils.isSuccess(conn)) {
                     String response = new BufferedReader(new InputStreamReader(conn.getInputStream()))
                             .lines()
                             .parallel()
@@ -243,10 +244,10 @@ public class Link {
                 }
                 break;
             case "tinyurl.com": {
-                HttpURLConnection conn = Http.openHttpConnection(this.url, "GET", false, requestTimeout);
-                Http.checkRateLimitExceeded(conn);
+                HttpURLConnection conn = HttpUtils.openHttpConnection(this.url, "GET", false, requestTimeout);
+                HttpUtils.checkRateLimitExceeded(conn);
 
-                if (Http.isRedirect(conn)) {
+                if (HttpUtils.isRedirect(conn)) {
                     longUrl = conn.getHeaderField("Location");
                 }
                 break;
@@ -283,13 +284,12 @@ public class Link {
     }
 
     public static void writeToCSV(List<Link> links, Path outputDir) {
-        Util.ensureDirectoryExists(outputDir);
-
         File outputFile = Paths.get(outputDir.toString(), "ValidatedLinks.csv").toFile();
-        if (outputFile.exists()) {
-            if (!outputFile.delete()) {
-                throw new IllegalStateException("Error while deleting output file: " + outputFile);
-            }
+        try {
+            FileUtils.ensureDirectoryExists(outputDir);
+            FileUtils.deleteFileIfExists(outputFile.toPath());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         try (CSVPrinter csvPrinter = new CSVPrinter(new FileWriter(outputFile), csvFormatValidatedUniqueLink)) {

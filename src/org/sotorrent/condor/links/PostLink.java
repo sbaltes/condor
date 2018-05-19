@@ -1,6 +1,6 @@
 package org.sotorrent.condor.links;
 
-import de.unitrier.st.util.Util;
+import de.unitrier.st.util.FileUtils;
 import org.apache.commons.csv.*;
 
 import java.io.File;
@@ -71,13 +71,12 @@ public class PostLink extends Link {
     }
 
     public static void writeToCSV(List<Link> postLinks, Path outputDir) {
-        Util.ensureDirectoryExists(outputDir);
-
         File outputFile = Paths.get(outputDir.toString(), "PostsLinks.csv").toFile();
-        if (outputFile.exists()) {
-            if (!outputFile.delete()) {
-                throw new IllegalStateException("Error while deleting output file: " + outputFile);
-            }
+        try {
+            FileUtils.ensureDirectoryExists(outputDir);
+            FileUtils.deleteFileIfExists(outputFile.toPath());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         logger.info("Writing post links to CSV file " + outputFile.getName() + " ...");

@@ -1,6 +1,6 @@
 package org.sotorrent.condor;
 
-import de.unitrier.st.util.Util;
+import de.unitrier.st.util.LogUtils;
 import org.apache.commons.cli.*;
 import org.sotorrent.condor.links.CommentLink;
 import org.sotorrent.condor.links.Link;
@@ -19,7 +19,7 @@ public class MatchDeveloperResources {
     static {
         // configure logger
         try {
-            logger = Util.getClassLogger(MatchDeveloperResources.class, true);
+            logger = LogUtils.getClassLogger(MatchDeveloperResources.class, true);
         } catch (IOException e) {
             e.printStackTrace();
         }

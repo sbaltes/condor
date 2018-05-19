@@ -1,6 +1,6 @@
 package org.sotorrent.condor.links;
 
-import de.unitrier.st.util.Util;
+import de.unitrier.st.util.FileUtils;
 import org.apache.commons.csv.*;
 
 import java.io.File;
@@ -70,13 +70,12 @@ public class CommentLink extends Link {
     }
 
     public static void writeToCSV(List<Link> commentLinks, Path outputDir) {
-        Util.ensureDirectoryExists(outputDir);
-
         File outputFile = Paths.get(outputDir.toString(), "CommentLinks.csv").toFile();
-        if (outputFile.exists()) {
-            if (!outputFile.delete()) {
-                throw new IllegalStateException("Error while deleting output file: " + outputFile);
-            }
+        try {
+            FileUtils.ensureDirectoryExists(outputDir);
+            FileUtils.deleteFileIfExists(outputFile.toPath());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         logger.info("Writing comment links to CSV file " + outputFile.getName() + " ...");

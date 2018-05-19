@@ -1,6 +1,6 @@
 package org.sotorrent.condor;
 
-import de.unitrier.st.util.Http;
+import de.unitrier.st.util.exceptions.RateLimitExceededException;
 import org.apache.commons.cli.*;
 import org.sotorrent.condor.links.Link;
 
@@ -75,7 +75,7 @@ public class ValidateLinks {
                     // link is dead
                     deadCount++;
                 }
-            } catch (Http.RateLimitExceededException e) {
+            } catch (RateLimitExceededException e) {
                 logger.warning(e.toString());
                 logger.warning("Stopping validation, because rate limit is exceeded.");
                 writeLinks(links, outputDirPath);
