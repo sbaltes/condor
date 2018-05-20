@@ -4,7 +4,6 @@ import com.google.gson.JsonParser;
 import de.unitrier.st.util.FileUtils;
 import de.unitrier.st.util.HttpUtils;
 import de.unitrier.st.util.Patterns;
-import de.unitrier.st.util.exceptions.RateLimitExceededException;
 import org.apache.commons.csv.*;
 import org.sotorrent.condor.resources.DeveloperResource;
 
@@ -39,7 +38,7 @@ public class Link {
                 .withFirstRecordAsHeader();
         // configure CSV format for resolved unique links
         csvFormatValidatedUniqueLink = CSVFormat.DEFAULT
-                .withHeader("Protocol", "RootDomain", "CompleteDomain", "Path", "Url", "Dead", "Resolved", "ResolvedUrl", "ResolvedUrlDead")
+                .withHeader("Protocol", "RootDomain", "CompleteDomain", "Path", "Url", "Dead", "ResponseCode", "Resolved", "ResolvedUrl", "ResolvedUrlDead", "ResolvedUrlResponseCode")
                 .withDelimiter(',')
                 .withQuote('"')
                 .withQuoteMode(QuoteMode.MINIMAL)
@@ -78,12 +77,15 @@ public class Link {
     DeveloperResource matchedDeveloperResource;
 
     private boolean dead;
+    private int responseCode;
     private boolean resolved;
+
     private Link resolvedLink;
 
     public Link(String url) {
         this.matchedDeveloperResource = null;
         this.dead = false;
+        this.responseCode = -1;
         this.resolved = false;
         this.resolvedLink = null;
         setUrl(url);
@@ -137,7 +139,7 @@ public class Link {
         this.matchedDeveloperResource = matchedDeveloperResource;
     }
 
-    public boolean checkIfDead(boolean followRedirects) throws IOException, RateLimitExceededException {
+    public boolean checkIfDead(boolean followRedirects) throws IOException {
         if (deadRootDomains.contains(rootDomain)) {
             this.dead = true;
             return true;
@@ -152,7 +154,7 @@ public class Link {
 
         // check if link is dead
         HttpURLConnection conn = HttpUtils.openHttpConnection(this.url, "GET", followRedirects, requestTimeout);
-        HttpUtils.checkRateLimitExceeded(conn);
+        this.responseCode = conn.getResponseCode();
 
         if (HttpUtils.isSuccess(conn) || HttpUtils.isRedirect(conn)) {
             this.dead = false;
@@ -163,7 +165,7 @@ public class Link {
         return true;
     }
 
-    public boolean resolveShortLink() throws IOException, RateLimitExceededException {
+    public boolean resolveShortLink() throws IOException {
         if (!linkShorteningDomains.contains(rootDomain)) {
             return false;
         }
@@ -185,7 +187,7 @@ public class Link {
                 );
 
                 HttpURLConnection conn = HttpUtils.openHttpConnection(apiUrl, "GET", true, requestTimeout);
-                HttpUtils.checkRateLimitExceeded(conn);
+                this.responseCode = conn.getResponseCode();
 
                 if (HttpUtils.isSuccess(conn)) {
                     String response = new BufferedReader(new InputStreamReader(conn.getInputStream()))
@@ -204,7 +206,7 @@ public class Link {
                 );
 
                 HttpURLConnection conn = HttpUtils.openHttpConnection(apiUrl, "GET", true, requestTimeout);
-                HttpUtils.checkRateLimitExceeded(conn);
+                this.responseCode = conn.getResponseCode();
 
                 if (HttpUtils.isSuccess(conn)) {
                     String response = new BufferedReader(new InputStreamReader(conn.getInputStream()))
@@ -223,7 +225,7 @@ public class Link {
             case "t.co": {
                 // see https://developer.twitter.com/en/docs/basics/tco
                 HttpURLConnection conn = HttpUtils.openHttpConnection(this.url, "GET", false, requestTimeout);
-                HttpUtils.checkRateLimitExceeded(conn);
+                this.responseCode = conn.getResponseCode();
 
                 if (HttpUtils.isSuccess(conn)) {
                     String response = new BufferedReader(new InputStreamReader(conn.getInputStream()))
@@ -245,7 +247,7 @@ public class Link {
                 break;
             case "tinyurl.com": {
                 HttpURLConnection conn = HttpUtils.openHttpConnection(this.url, "GET", false, requestTimeout);
-                HttpUtils.checkRateLimitExceeded(conn);
+                this.responseCode = conn.getResponseCode();
 
                 if (HttpUtils.isRedirect(conn)) {
                     longUrl = conn.getHeaderField("Location");
@@ -297,9 +299,10 @@ public class Link {
             for (Link link : links) {
                 csvPrinter.printRecord(
                         link.protocol, link.rootDomain, link.completeDomain, link.path, link.url,
-                        link.dead, link.resolved,
+                        link.dead, link.responseCode, link.resolved,
                         link.resolvedLink == null ? "" : link.resolvedLink.url,
-                        link.resolvedLink == null ? "" : link.resolvedLink.dead
+                        link.resolvedLink == null ? "" : link.resolvedLink.dead,
+                        link.resolvedLink == null ? "" : link.resolvedLink.responseCode
                 );
             }
         } catch (IOException e) {
