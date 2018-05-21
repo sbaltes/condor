@@ -12,6 +12,7 @@ import java.net.HttpURLConnection;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
 import static org.sotorrent.condor.MatchDeveloperResources.logger;
@@ -128,37 +129,68 @@ public class Link {
     }
 
     public void setUrl(String url) {
-        this.url = url;
-        this.protocol = Patterns.extractProtocol(url);
-        this.completeDomain = Patterns.extractCompleteDomain(url);
-        this.rootDomain = Patterns.extractRootDomain(completeDomain);
-        this.path = Patterns.extractPath(url);
+        Matcher urlMatcher = Patterns.url.matcher(url);
+        if (!urlMatcher.find()) {
+            throw new IllegalArgumentException("Malformed URL: " + url);
+        }
+        this.url = urlMatcher.group(0);
+        this.protocol = Patterns.extractProtocolFromUrl(this.url);
+        this.completeDomain = Patterns.extractCompleteDomainFromUrl(this.url);
+        this.rootDomain = Patterns.extractRootDomainFromCompleteDomain(completeDomain);
+        this.path = Patterns.extractPathFromUrl(this.url);
     }
 
     public void setMatchedDeveloperResource(DeveloperResource matchedDeveloperResource) {
         this.matchedDeveloperResource = matchedDeveloperResource;
     }
 
-    public boolean checkIfDead(boolean followRedirects) throws IOException {
+    private void wait(int min, int max) {
+        try {
+            Thread.sleep(rand.nextInt(max-min) + min);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public boolean checkIfDead(boolean followRedirects) {
         if (deadRootDomains.contains(rootDomain)) {
             this.dead = true;
             return true;
         }
 
-        // wait between requests
+        HttpURLConnection conn = null;
+        boolean executeGetRequest = false; // try HEAD request first, if that fails try GET request
+
+        wait(50, 1000);  // wait between requests
         try {
-            Thread.sleep(rand.nextInt(950) + 50);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+            // try HEAD request first
+            conn = HttpUtils.openHttpConnection(this.url, "HEAD", followRedirects, requestTimeout);
+            this.responseCode = conn.getResponseCode();
+            if (!HttpUtils.isSuccess(conn) && !HttpUtils.isRedirect(conn)) {
+                executeGetRequest = true;
+            }
+        } catch (IOException e) {
+            executeGetRequest = true;
         }
 
-        // check if link is dead
-        HttpURLConnection conn = HttpUtils.openHttpConnection(this.url, "GET", followRedirects, requestTimeout);
-        this.responseCode = conn.getResponseCode();
+        if (executeGetRequest) {
+            wait(50, 1000);  // wait between requests
+            try {
+                // if HEAD request fails, try a GET request
+                conn = HttpUtils.openHttpConnection(this.url, "GET", followRedirects, requestTimeout);
+                this.responseCode = conn.getResponseCode();
+            } catch (IOException e) {
+                logger.warning(e.toString());
+            }
+        }
 
-        if (HttpUtils.isSuccess(conn) || HttpUtils.isRedirect(conn)) {
-            this.dead = false;
-            return false;
+        try {
+            if (conn != null && (HttpUtils.isSuccess(conn) || HttpUtils.isRedirect(conn))) {
+                this.dead = false;
+                return false;
+            }
+        } catch (IOException e) {
+            logger.warning(e.toString());
         }
 
         this.dead = true;
@@ -170,12 +202,7 @@ public class Link {
             return false;
         }
 
-        // wait between requests
-        try {
-            Thread.sleep(rand.nextInt(950)+50);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        wait(50, 1000);  // wait between requests
 
         String longUrl = null;
 

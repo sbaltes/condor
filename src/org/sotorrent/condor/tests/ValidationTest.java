@@ -12,25 +12,21 @@ class ValidationTest {
 
     @Test
     void testCheckIfDead() {
-        try {
-            // check valid http link
-            Link validHttpLink = new Link("http://www.ayl.de/");
-            assertFalse(validHttpLink.checkIfDead(true));
+        // check valid http link
+        Link validHttpLink = new Link("http://dblp.uni-trier.de/");
+        assertFalse(validHttpLink.checkIfDead(true));
 
-            // check valid https link
-            Link validHttpsLink = new Link("https://www.google.de/");
-            assertFalse(validHttpsLink.checkIfDead(true));
+        // check valid https link
+        Link validHttpsLink = new Link("https://www.google.de/");
+        assertFalse(validHttpsLink.checkIfDead(true));
 
-            // check redirect link
-            Link validRedirectLink = new Link("http://java.sun.com/javase/6/docs/api/");
-            assertFalse(validRedirectLink.checkIfDead(true));
+        // check redirect link
+        Link validRedirectLink = new Link("http://java.sun.com/javase/6/docs/api/");
+        assertFalse(validRedirectLink.checkIfDead(true));
 
-            // check dead link
-            Link deadLink = new Link("http://fiddle.re/26pu");
-            assertTrue(deadLink.checkIfDead(true));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        // check dead link
+        Link deadLink = new Link("http://fiddle.re/26pu");
+        assertTrue(deadLink.checkIfDead(true));
     }
 
     @Test
@@ -44,7 +40,7 @@ class ValidationTest {
             Link bitlyLink = new Link("http://bit.ly/1f14xXU");
             assertTrue(bitlyLink.resolveShortLink());
             assertFalse(bitlyLink.checkIfDead(false));  // check shortened link, not follow redirect
-            assertTrue(bitlyLink.getResolvedLink().isDead());
+            assertFalse(bitlyLink.getResolvedLink().isDead());
 
             Link tcoLink = new Link("https://t.co/gQc3D63VWU");
             assertTrue(tcoLink.resolveShortLink());
