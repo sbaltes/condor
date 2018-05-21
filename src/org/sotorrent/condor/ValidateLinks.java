@@ -3,11 +3,13 @@ package org.sotorrent.condor;
 import org.apache.commons.cli.*;
 import org.sotorrent.condor.links.Link;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Locale;
+import java.util.Properties;
 
 import static org.sotorrent.condor.MatchDeveloperResources.logger;
 
@@ -44,6 +46,15 @@ public class ValidateLinks {
         Path uniqueLinksPath = Paths.get(commandLine.getOptionValue("unique-links"));
         Path outputDirPath = Paths.get(commandLine.getOptionValue("output-dir"));
 
+        // read properties
+        Properties properties = new Properties();
+        try {
+            properties.load(new FileInputStream("condor.properties"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // read and validate unique links
         logger.info("Reading unique links...");
         List<Link> links = Link.readFromCSV(uniqueLinksPath);
         logger.info(links.size() + " unique links read.");
@@ -63,7 +74,7 @@ public class ValidateLinks {
             }
 
             try {
-                if (link.resolveShortLink()) {
+                if (link.resolveShortLink(properties)) {
                     // link has been resolved
                     resolveCount++;
                     if (link.checkIfDead(false)) {

@@ -24,8 +24,6 @@ import static org.sotorrent.condor.MatchDeveloperResources.logger;
 public class Link {
     private static Random rand = new Random();
     private static final int requestTimeout = 10000;
-    private static final String googlApiKey = "AIzaSyCDX5TjLNcgrChJpiesnmfVkaizRhi0aiM";
-    private static final String bitlyAccessToken = "98fbb6a9eec4683ccbe67a87196949c702038fb8";
 
     private static final CSVFormat csvFormatUniqueLink, csvFormatValidatedUniqueLink;
     static {
@@ -197,7 +195,7 @@ public class Link {
         return true;
     }
 
-    public boolean resolveShortLink() throws IOException {
+    public boolean resolveShortLink(Properties properties) throws IOException {
         if (!linkShorteningDomains.contains(rootDomain)) {
             return false;
         }
@@ -210,7 +208,7 @@ public class Link {
             case "goo.gl": {
                 // see https://developers.google.com/url-shortener/v1/getting_started#expand
                 String apiUrl = String.format("https://www.googleapis.com/urlshortener/v1/url?key=%s&shortUrl=%s",
-                        googlApiKey, this.url
+                        properties.getProperty("googl-api-key"), this.url
                 );
 
                 HttpURLConnection conn = HttpUtils.openHttpConnection(apiUrl, "GET", true, requestTimeout);
@@ -229,7 +227,7 @@ public class Link {
             case "bit.ly": {
                 // see https://dev.bitly.com/links.html
                 String apiUrl = String.format("https://api-ssl.bitly.com/v3/expand?access_token=%s&shortUrl=%s",
-                        bitlyAccessToken, this.url
+                        properties.getProperty("bitly-access-token"), this.url
                 );
 
                 HttpURLConnection conn = HttpUtils.openHttpConnection(apiUrl, "GET", true, requestTimeout);
