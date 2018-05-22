@@ -1,6 +1,6 @@
 package org.sotorrent.condor.links;
 
-import de.unitrier.st.util.FileUtils;
+import org.sotorrent.util.FileUtils;
 import org.apache.commons.csv.*;
 
 import java.io.File;

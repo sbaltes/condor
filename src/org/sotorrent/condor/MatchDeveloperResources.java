@@ -1,6 +1,6 @@
 package org.sotorrent.condor;
 
-import de.unitrier.st.util.LogUtils;
+import org.sotorrent.util.LogUtils;
 import org.apache.commons.cli.*;
 import org.sotorrent.condor.links.CommentLink;
 import org.sotorrent.condor.links.Link;

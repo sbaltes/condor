@@ -1,9 +1,9 @@
 package org.sotorrent.condor.links;
 
 import com.google.gson.JsonParser;
-import de.unitrier.st.util.FileUtils;
-import de.unitrier.st.util.HttpUtils;
-import de.unitrier.st.util.Patterns;
+import org.sotorrent.util.FileUtils;
+import org.sotorrent.util.HttpUtils;
+import org.sotorrent.util.Patterns;
 import org.apache.commons.csv.*;
 import org.sotorrent.condor.resources.DeveloperResource;
 
