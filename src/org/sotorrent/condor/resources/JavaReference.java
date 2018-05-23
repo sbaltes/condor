@@ -1,16 +1,14 @@
 package org.sotorrent.condor.resources;
 
-import com.google.common.collect.Sets;
-
 /**
  * Class for developer resource "JavaReference".
  * It matches links to official Java documentation, except for the Java API documentation.
  */
-public class JavaReference extends DeveloperResource {
-    JavaReference() {
-        super();
-
-        rootDomains = Sets.newHashSet("oracle.com", "sun.com");
+public class JavaReference extends DeveloperResource 
+{
+    JavaReference() 
+    {
+        super("oracle.com", "sun.com");
 
         createResourcePattern(new String[]{
                 // TODO: add patterns for java.sun.com links

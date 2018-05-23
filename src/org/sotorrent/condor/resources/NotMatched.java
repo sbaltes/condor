@@ -6,29 +6,36 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class NotMatched extends DeveloperResource {
-    public NotMatched(Set<DeveloperResource> developerResources) {
-        super();
-
-        rootDomains = developerResources.stream()
-                .flatMap(dr -> dr.rootDomains.stream())
-                .collect(Collectors.toSet());
+public class NotMatched extends DeveloperResource 
+{
+    public NotMatched(Set<DeveloperResource> developerResources) 
+    {
+        super(developerResources.stream()
+                .flatMap(dr -> dr.rootDomains())
+                .collect(Collectors.toSet()));
     }
 
     @Override
-    public boolean match(Link link) {
-        if (rootDomains.contains(link.getRootDomain())) {
+    public boolean match(Link link) 
+    {
+        if(contains(link.getRootDomain())) 
+        {
             link.setMatchedDeveloperResource(this);
-            matchedLinks.add(link);
+            addMatchedLink(link);
             return true;
-        } else {
+        } 
+        else 
+        {
             return false;
         }
     }
 
-    public void mark(List<Link> links) {
-        for (Link link : links) {
-            if (link.getMatchedDeveloperResource() == null) {
+    public void mark(List<Link> links) 
+    {
+        for (Link link : links)
+        {
+            if (link.getMatchedDeveloperResource() == null) 
+            {
                 match(link);
             }
         }
