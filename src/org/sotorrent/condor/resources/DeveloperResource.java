@@ -74,7 +74,7 @@ abstract public class DeveloperResource
                 new StackOverflow(),
                 new JavaAPI(),
                 new JavaReference(),
-                new RegularExpressionsInfo()
+                new IndependentTutorial()
         );
     }
 

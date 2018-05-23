@@ -1,12 +1,12 @@
 package org.sotorrent.condor.resources;
 
 /**
- * Class for developer resource "JavaAPI".
- * It matches links to the official Java API documentation.
+ * Represents tutorial and information pages contributed
+ * by independent experts.
  */
-public class RegularExpressionsInfo extends DeveloperResource 
+public class IndependentTutorial extends DeveloperResource 
 {
-    RegularExpressionsInfo() 
+    IndependentTutorial() 
     {
     	super("regular-expressions.info");
         createResourcePattern(new String[]{
