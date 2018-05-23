@@ -10,7 +10,7 @@ public class IndependentTutorial extends DeveloperResource
     {
     	super("regular-expressions.info");
         createResourcePattern(new String[]{
-                "^https?://(www\\.)?regular-expressions.info.*"
+                "^https?://(www\\.)?regular-expressions\\.info.*"
         });
     }
 }
