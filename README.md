@@ -43,3 +43,6 @@ Linux/macOS:
 `-u` Path to CSV file with unique links.
 
 `-o` Path to output directory.
+
+To re-validate a result list (`ValidatedLinks.csv`), pass it using the `-u` parameters. The tool detects the result
+list and only re-validates links with a 429 response code (too many requests).

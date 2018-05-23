@@ -7,6 +7,7 @@ import org.sotorrent.util.Patterns;
 import org.apache.commons.csv.*;
 import org.sotorrent.condor.resources.DeveloperResource;
 
+import javax.net.ssl.SSLHandshakeException;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.nio.file.Path;
@@ -24,6 +25,7 @@ import static org.sotorrent.condor.MatchDeveloperResources.logger;
 public class Link {
     private static Random rand = new Random();
     private static final int requestTimeout = 10000;
+    private static boolean onlyProcessRateLimitFailures = false;
 
     private static final CSVFormat csvFormatUniqueLink, csvFormatValidatedUniqueLink;
     static {
@@ -67,16 +69,16 @@ public class Link {
         deadRootDomains.add("ccil.org");
     }
 
+    String url;
     String protocol;
     String rootDomain;
     String completeDomain;
     String path;
-    String url;
 
     DeveloperResource matchedDeveloperResource;
 
     private boolean dead;
-    private int responseCode;
+    private String responseCode;
     private boolean resolved;
 
     private Link resolvedLink;
@@ -84,10 +86,28 @@ public class Link {
     public Link(String url) {
         this.matchedDeveloperResource = null;
         this.dead = false;
-        this.responseCode = -1;
+        this.responseCode = "-1";
         this.resolved = false;
         this.resolvedLink = null;
         setUrl(url);
+    }
+
+    public Link(String protocol, String rootDomain, String completeDomain, String path, String url,
+         boolean dead, String responseCode,
+         boolean resolved, String resolvedUrl, Boolean resolvedUrlDead, String resolvedUrlResponseCode) {
+        this.protocol = protocol;
+        this.rootDomain = rootDomain;
+        this.completeDomain = completeDomain;
+        this.path = path;
+        this.url = url;
+        this.dead = dead;
+        this.responseCode = responseCode;
+        this.resolved = resolved;
+        if (resolvedUrl.length() > 0) {
+            this.resolvedLink = new Link(resolvedUrl);
+            this.resolvedLink.dead = resolvedUrlDead;
+            this.resolvedLink.responseCode = resolvedUrlResponseCode;
+        }
     }
 
     public String getProtocol() {
@@ -118,6 +138,10 @@ public class Link {
         return resolvedLink;
     }
 
+    public String getResponseCode() {
+        return responseCode;
+    }
+
     public boolean isDead() {
         return dead;
     }
@@ -142,6 +166,22 @@ public class Link {
         this.matchedDeveloperResource = matchedDeveloperResource;
     }
 
+    public void setDead(boolean dead) {
+        this.dead = dead;
+    }
+
+    public void setResponseCode(String responseCode) {
+        this.responseCode = responseCode;
+    }
+
+    public void setResolved(boolean resolved) {
+        this.resolved = resolved;
+    }
+
+    public void setResolvedLink(Link resolvedLink) {
+        this.resolvedLink = resolvedLink;
+    }
+
     private void wait(int min, int max) {
         try {
             Thread.sleep(rand.nextInt(max-min) + min);
@@ -151,6 +191,10 @@ public class Link {
     }
 
     public boolean checkIfDead(boolean followRedirects) {
+        if (Link.onlyProcessRateLimitFailures && !this.responseCode.equals("429")) {
+            return false;
+        }
+
         if (deadRootDomains.contains(rootDomain)) {
             this.dead = true;
             return true;
@@ -163,7 +207,7 @@ public class Link {
         try {
             // try HEAD request first
             conn = HttpUtils.openHttpConnection(this.url, "HEAD", followRedirects, requestTimeout);
-            this.responseCode = conn.getResponseCode();
+            this.responseCode = Integer.toString(conn.getResponseCode());
             if (!HttpUtils.isSuccess(conn) && !HttpUtils.isRedirect(conn)) {
                 executeGetRequest = true;
             }
@@ -176,7 +220,9 @@ public class Link {
             try {
                 // if HEAD request fails, try a GET request
                 conn = HttpUtils.openHttpConnection(this.url, "GET", followRedirects, requestTimeout);
-                this.responseCode = conn.getResponseCode();
+                this.responseCode = Integer.toString(conn.getResponseCode());
+            } catch (SSLHandshakeException e) {
+                this.responseCode = "SSLError";
             } catch (IOException e) {
                 logger.warning(e.toString());
             }
@@ -196,7 +242,8 @@ public class Link {
     }
 
     public boolean resolveShortLink(Properties properties) throws IOException {
-        if (!linkShorteningDomains.contains(rootDomain)) {
+        if (!linkShorteningDomains.contains(rootDomain)
+                || (Link.onlyProcessRateLimitFailures && !this.responseCode.equals("429"))) {
             return false;
         }
 
@@ -212,7 +259,7 @@ public class Link {
                 );
 
                 HttpURLConnection conn = HttpUtils.openHttpConnection(apiUrl, "GET", true, requestTimeout);
-                this.responseCode = conn.getResponseCode();
+                this.responseCode = Integer.toString(conn.getResponseCode());
 
                 if (HttpUtils.isSuccess(conn)) {
                     String response = new BufferedReader(new InputStreamReader(conn.getInputStream()))
@@ -231,7 +278,7 @@ public class Link {
                 );
 
                 HttpURLConnection conn = HttpUtils.openHttpConnection(apiUrl, "GET", true, requestTimeout);
-                this.responseCode = conn.getResponseCode();
+                this.responseCode = Integer.toString(conn.getResponseCode());
 
                 if (HttpUtils.isSuccess(conn)) {
                     String response = new BufferedReader(new InputStreamReader(conn.getInputStream()))
@@ -250,7 +297,7 @@ public class Link {
             case "t.co": {
                 // see https://developer.twitter.com/en/docs/basics/tco
                 HttpURLConnection conn = HttpUtils.openHttpConnection(this.url, "GET", false, requestTimeout);
-                this.responseCode = conn.getResponseCode();
+                this.responseCode = Integer.toString(conn.getResponseCode());
 
                 if (HttpUtils.isSuccess(conn)) {
                     String response = new BufferedReader(new InputStreamReader(conn.getInputStream()))
@@ -272,7 +319,7 @@ public class Link {
                 break;
             case "tinyurl.com": {
                 HttpURLConnection conn = HttpUtils.openHttpConnection(this.url, "GET", false, requestTimeout);
-                this.responseCode = conn.getResponseCode();
+                this.responseCode = Integer.toString(conn.getResponseCode());
 
                 if (HttpUtils.isRedirect(conn)) {
                     longUrl = conn.getHeaderField("Location");
@@ -300,8 +347,31 @@ public class Link {
             logger.info("Reading unique links from CSV file " + pathToCSVFile.toFile().toString() + " ...");
 
             for (CSVRecord currentRecord : csvParser) {
-                String url = currentRecord.get("Url");
-                links.add(new Link(url));
+                if (currentRecord.size() == 1) {
+                    // only URLs
+                    String url = currentRecord.get("Url");
+                    links.add(new Link(url));
+                } else if (currentRecord.size() == 11) {
+                    // already processed URLs
+                    onlyProcessRateLimitFailures = true;
+                    String protocol = currentRecord.get("Protocol");
+                    String rootDomain = currentRecord.get("RootDomain");
+                    String completeDomain = currentRecord.get("CompleteDomain");
+                    String path = currentRecord.get("Path");
+                    String url = currentRecord.get("Url");
+                    boolean dead = Boolean.valueOf(currentRecord.get("Dead"));
+                    String responseCode = currentRecord.get("ResponseCode");
+                    boolean resolved = Boolean.valueOf(currentRecord.get("Resolved"));
+                    String resolvedUrl = currentRecord.get("ResolvedUrl");
+                    Boolean resolvedUrlDead = null;
+                    if (currentRecord.get("ResolvedUrlDead").length() > 0) {
+                        resolvedUrlDead = Boolean.valueOf(currentRecord.get("ResolvedUrlDead"));
+                    }
+                    String resolvedUrlResponseCode = currentRecord.get("ResolvedUrlResponseCode");
+                    links.add(new Link(protocol, rootDomain, completeDomain, path, url, dead, responseCode,
+                            resolved, resolvedUrl, resolvedUrlDead, resolvedUrlResponseCode));
+                }
+
             }
         } catch (IOException e) {
             e.printStackTrace();

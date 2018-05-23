@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ValidationTest {
@@ -29,6 +30,11 @@ class ValidationTest {
         // check dead link
         Link deadLink = new Link("http://fiddle.re/26pu");
         assertTrue(deadLink.checkIfDead(true));
+
+        // this link produces a SSLHandshakeException
+        Link sslErrorLink = new Link("https://www.debuggex.com/i/u1J8uHpK4CQXNC8e.png");
+        sslErrorLink.checkIfDead(true);
+        assertEquals("SSLError", sslErrorLink.getResponseCode());
     }
 
     @Test
@@ -64,5 +70,34 @@ class ValidationTest {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Test
+    void testResultListConstructor() {
+        Link link_url = new Link("http://bit.ly/unipain");
+        link_url.setDead(false);
+        link_url.setResponseCode("301");
+        link_url.setResolved(true);
+        link_url.setResolvedLink(new Link("http://nedbatchelder.com/text/unipain.html"));
+        link_url.getResolvedLink().setDead(false);
+        link_url.getResolvedLink().setResponseCode("301");
+
+        Link link = new Link(link_url.getProtocol(), link_url.getRootDomain(), link_url.getCompleteDomain(),
+                link_url.getPath(), link_url.getUrl(), link_url.isDead(), link_url.getResponseCode(),
+                link_url.isResolved(), link_url.getResolvedLink().getUrl(), link_url.getResolvedLink().isDead(),
+                link_url.getResolvedLink().getResponseCode()
+        );
+
+        assertEquals(link_url.getProtocol(), link.getProtocol());
+        assertEquals(link_url.getRootDomain(), link.getRootDomain());
+        assertEquals(link_url.getCompleteDomain(), link.getCompleteDomain());
+        assertEquals(link_url.getPath(), link.getPath());
+        assertEquals(link_url.getUrl(), link.getUrl());
+        assertEquals(link_url.isDead(), link.isDead());
+        assertEquals(link_url.getResponseCode(), link.getResponseCode());
+        assertEquals(link_url.isResolved(), link.isResolved());
+        assertEquals(link_url.getResolvedLink().getUrl(), link.getResolvedLink().getUrl());
+        assertEquals(link_url.getResolvedLink().isDead(), link.getResolvedLink().isDead());
+        assertEquals(link_url.getResolvedLink().getResponseCode(), link.getResolvedLink().getResponseCode());
     }
 }
