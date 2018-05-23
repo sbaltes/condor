@@ -6,27 +6,45 @@ import org.sotorrent.condor.links.Link;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Base class for all developer resources.
  */
-abstract public class DeveloperResource {
-    Set<String> rootDomains;
-    private Pattern resourcePattern;
-    List<Link> matchedLinks;
+abstract public class DeveloperResource 
+{
+    private final Set<String> aRootDomains;
+    private Pattern aResourcePattern;
+    private List<Link> aMatchedLinks = new LinkedList<>();
 
-    DeveloperResource() {
-        matchedLinks = new LinkedList<>();
+    DeveloperResource(String... pRootDomains) 
+    {
+    	aRootDomains = Sets.newHashSet(pRootDomains);
+    }
+    
+    DeveloperResource(Set<String> pRootDomains) 
+    {
+    	aRootDomains = new HashSet<>(pRootDomains);
+    }
+    
+    Stream<String> rootDomains()
+    {
+    	return aRootDomains.stream();
+    }
+    
+    boolean contains(String pDomain)
+    {
+    	return aRootDomains.contains(pDomain);
     }
 
     void createResourcePattern(String[] urlPatterns) {
-        resourcePattern = Pattern.compile(Arrays.stream(urlPatterns).collect(Collectors.joining("|")));
+        aResourcePattern = Pattern.compile(Arrays.stream(urlPatterns).collect(Collectors.joining("|")));
     }
 
     public boolean match(Link link) {
-        if (rootDomains.contains(link.getRootDomain()) && resourcePattern.matcher(link.getUrl()).find()) {
+        if (aRootDomains.contains(link.getRootDomain()) && aResourcePattern.matcher(link.getUrl()).find()) {
             link.setMatchedDeveloperResource(this);
-            matchedLinks.add(link);
+            aMatchedLinks.add(link);
             return true;
         } else {
             return false;
@@ -41,16 +59,22 @@ abstract public class DeveloperResource {
         }
         return false;
     }
+    
+    public void addMatchedLink(Link pLink)
+    {
+    	aMatchedLinks.add(pLink);
+    }
 
     public int getMatchedLinkCount() {
-        return matchedLinks.size();
+        return aMatchedLinks.size();
     }
 
     public static Set<DeveloperResource> createDeveloperResources() {
         return Sets.newHashSet(
                 new StackOverflow(),
                 new JavaAPI(),
-                new JavaReference()
+                new JavaReference(),
+                new RegularExpressionsInfo()
         );
     }
 

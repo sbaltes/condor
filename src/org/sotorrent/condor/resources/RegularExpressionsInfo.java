@@ -4,13 +4,13 @@ package org.sotorrent.condor.resources;
  * Class for developer resource "JavaAPI".
  * It matches links to the official Java API documentation.
  */
-public class JavaAPI extends DeveloperResource 
+public class RegularExpressionsInfo extends DeveloperResource 
 {
-    JavaAPI() 
+    RegularExpressionsInfo() 
     {
-    	super("oracle.com", "sun.com");
+    	super("regular-expressions.info");
         createResourcePattern(new String[]{
-                "^https?://(docs\\.oracle\\.com|java\\.sun\\.com)/java(s|e)e/[\\d\\.]+/docs/api/.*"
+                "^https?://(www\\.)?regular-expressions.info.*"
         });
     }
 }
