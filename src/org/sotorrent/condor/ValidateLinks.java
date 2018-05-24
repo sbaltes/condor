@@ -73,20 +73,16 @@ public class ValidateLinks {
                 logger.info("Validating unique link " + (i+1) + " of " + links.size() + " (" + progress + ")");
             }
 
-            try {
-                if (link.resolveShortLink(properties)) {
-                    // link has been resolved
-                    resolveCount++;
-                    if (link.checkIfDead(false)) {
-                        // check shortened link, not follow redirect
-                        deadCount++;
-                    }
-                } else if (link.checkIfDead(true)) {
-                    // link is dead
+            if (link.resolveShortLink(properties)) {
+                // link has been resolved
+                resolveCount++;
+                if (link.checkIfDead(false)) {
+                    // check shortened link, not follow redirect
                     deadCount++;
                 }
-            } catch (IOException e) {
-                logger.warning(e.toString());
+            } else if (link.checkIfDead(true)) {
+                // link is dead
+                deadCount++;
             }
         }
 

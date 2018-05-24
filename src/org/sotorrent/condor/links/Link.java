@@ -199,6 +199,7 @@ public class Link {
 
         if (deadRootDomains.contains(rootDomain)) {
             this.dead = true;
+            this.responseCode = "DeadRootDomain";
             return true;
         }
 
@@ -210,7 +211,7 @@ public class Link {
             // try HEAD request first
             conn = HttpUtils.openHttpConnection(this.url, "HEAD", followRedirects, requestTimeout);
             this.responseCode = Integer.toString(conn.getResponseCode());
-            if (!HttpUtils.isSuccess(conn) && !HttpUtils.isRedirect(conn)) {
+            if (!HttpUtils.success(conn) && !HttpUtils.redirect(conn)) {
                 executeGetRequest = true;
             }
         } catch (IOException e) {
@@ -223,27 +224,21 @@ public class Link {
                 // if HEAD request fails, try a GET request
                 conn = HttpUtils.openHttpConnection(this.url, "GET", followRedirects, requestTimeout);
                 this.responseCode = Integer.toString(conn.getResponseCode());
-            } catch (SSLHandshakeException e) {
-                this.responseCode = "SSLError";
             } catch (IOException e) {
-                logger.warning(e.toString());
+                this.responseCode = e.getClass().getSimpleName();
             }
         }
 
-        try {
-            if (conn != null && (HttpUtils.isSuccess(conn) || HttpUtils.isRedirect(conn))) {
-                this.dead = false;
-                return false;
-            }
-        } catch (IOException e) {
-            logger.warning(e.toString());
+        if (conn != null && (HttpUtils.success(conn) || HttpUtils.redirect(conn))) {
+            this.dead = false;
+            return false;
         }
 
         this.dead = true;
         return true;
     }
 
-    public boolean resolveShortLink(Properties properties) throws IOException {
+    public boolean resolveShortLink(Properties properties) {
         if (!linkShorteningDomains.contains(rootDomain)
                 || (Link.onlyProcessRateLimitFailures && !this.responseCode.equals("429"))) {
             return false;
@@ -260,16 +255,24 @@ public class Link {
                         properties.getProperty("googl-api-key"), this.url
                 );
 
-                HttpURLConnection conn = HttpUtils.openHttpConnection(apiUrl, "GET", true, requestTimeout);
-                this.responseCode = Integer.toString(conn.getResponseCode());
+                HttpURLConnection conn = null;
+                try {
+                    conn = HttpUtils.openHttpConnection(apiUrl, "GET", true, requestTimeout);
+                    this.responseCode = Integer.toString(conn.getResponseCode());
+                } catch (IOException e) {
+                    this.responseCode = e.getClass().getSimpleName();
+                }
 
-                if (HttpUtils.isSuccess(conn)) {
-                    String response = new BufferedReader(new InputStreamReader(conn.getInputStream()))
-                            .lines()
-                            .parallel()
-                            .collect(Collectors.joining("\n"));
-
-                    longUrl = new JsonParser().parse(response).getAsJsonObject().get("longUrl").getAsString();
+                if (conn != null && HttpUtils.success(conn)) {
+                    try {
+                        String response = new BufferedReader(new InputStreamReader(conn.getInputStream()))
+                                .lines()
+                                .parallel()
+                                .collect(Collectors.joining("\n"));
+                        longUrl = new JsonParser().parse(response).getAsJsonObject().get("longUrl").getAsString();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
                 break;
             }
@@ -279,38 +282,56 @@ public class Link {
                         properties.getProperty("bitly-access-token"), this.url
                 );
 
-                HttpURLConnection conn = HttpUtils.openHttpConnection(apiUrl, "GET", true, requestTimeout);
-                this.responseCode = Integer.toString(conn.getResponseCode());
+                HttpURLConnection conn = null;
+                try {
+                    conn = HttpUtils.openHttpConnection(apiUrl, "GET", true, requestTimeout);
+                    this.responseCode = Integer.toString(conn.getResponseCode());
+                } catch (IOException e) {
+                    this.responseCode = e.getClass().getSimpleName();
+                }
 
-                if (HttpUtils.isSuccess(conn)) {
-                    String response = new BufferedReader(new InputStreamReader(conn.getInputStream()))
-                            .lines()
-                            .parallel()
-                            .collect(Collectors.joining("\n"));
+                if (conn != null  && HttpUtils.success(conn)) {
+                    try {
+                        String response = new BufferedReader(new InputStreamReader(conn.getInputStream()))
+                                .lines()
+                                .parallel()
+                                .collect(Collectors.joining("\n"));
 
-                    longUrl = new JsonParser().parse(response).getAsJsonObject()
-                            .get("data").getAsJsonObject()
-                            .get("expand").getAsJsonArray()
-                            .get(0).getAsJsonObject()
-                            .get("long_url").getAsString();
+                        longUrl = new JsonParser().parse(response).getAsJsonObject()
+                                .get("data").getAsJsonObject()
+                                .get("expand").getAsJsonArray()
+                                .get(0).getAsJsonObject()
+                                .get("long_url").getAsString();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
                 break;
             }
             case "t.co": {
                 // see https://developer.twitter.com/en/docs/basics/tco
-                HttpURLConnection conn = HttpUtils.openHttpConnection(this.url, "GET", false, requestTimeout);
-                this.responseCode = Integer.toString(conn.getResponseCode());
+                HttpURLConnection conn = null;
+                try {
+                    conn = HttpUtils.openHttpConnection(this.url, "GET", false, requestTimeout);
+                    this.responseCode = Integer.toString(conn.getResponseCode());
+                } catch (IOException e) {
+                    this.responseCode = e.getClass().getSimpleName();
+                }
 
-                if (HttpUtils.isSuccess(conn)) {
-                    String response = new BufferedReader(new InputStreamReader(conn.getInputStream()))
-                            .lines()
-                            .parallel()
-                            .collect(Collectors.joining("\n"));
+                if (conn != null && HttpUtils.success(conn)) {
+                    try {
+                        String response = new BufferedReader(new InputStreamReader(conn.getInputStream()))
+                                .lines()
+                                .parallel()
+                                .collect(Collectors.joining("\n"));
 
-                    // example:
-                    // <head><meta name="referrer" content="always"><noscript><META http-equiv="refresh" content="0;URL=http://youtu.be/8EYeX5PkDXQ?a"></noscript><title>http://youtu.be/8EYeX5PkDXQ?a</title></head><script>window.opener = null; location.replace("http:\/\/youtu.be\/8EYeX5PkDXQ?a")</script>
-                    response = response.substring(response.indexOf("URL=") + 4);
-                    longUrl = response.substring(0, response.indexOf("\">"));
+                        // example:
+                        // <head><meta name="referrer" content="always"><noscript><META http-equiv="refresh" content="0;URL=http://youtu.be/8EYeX5PkDXQ?a"></noscript><title>http://youtu.be/8EYeX5PkDXQ?a</title></head><script>window.opener = null; location.replace("http:\/\/youtu.be\/8EYeX5PkDXQ?a")</script>
+                        response = response.substring(response.indexOf("URL=") + 4);
+                        longUrl = response.substring(0, response.indexOf("\">"));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
                 break;
             }
@@ -320,10 +341,15 @@ public class Link {
                 }
                 break;
             case "tinyurl.com": {
-                HttpURLConnection conn = HttpUtils.openHttpConnection(this.url, "GET", false, requestTimeout);
-                this.responseCode = Integer.toString(conn.getResponseCode());
+                HttpURLConnection conn = null;
+                try {
+                    conn = HttpUtils.openHttpConnection(this.url, "GET", false, requestTimeout);
+                    this.responseCode = Integer.toString(conn.getResponseCode());
+                } catch (IOException e) {
+                    this.responseCode = e.getClass().getSimpleName();
+                }
 
-                if (HttpUtils.isRedirect(conn)) {
+                if (conn != null && HttpUtils.redirect(conn)) {
                     longUrl = conn.getHeaderField("Location");
                 }
                 break;

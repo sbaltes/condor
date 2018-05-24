@@ -34,7 +34,17 @@ class ValidationTest {
         // this link produces a SSLHandshakeException
         Link sslErrorLink = new Link("https://www.debuggex.com/i/u1J8uHpK4CQXNC8e.png");
         sslErrorLink.checkIfDead(true);
-        assertEquals("SSLError", sslErrorLink.getResponseCode());
+        assertEquals("SSLHandshakeException", sslErrorLink.getResponseCode());
+
+        // this link has a dead root domain
+        Link deadRootDomainLink = new Link("http://fiddle.re/2r7c");
+        deadRootDomainLink.checkIfDead(true);
+        assertEquals("DeadRootDomain", deadRootDomainLink.getResponseCode());
+
+        // this link produces an UnknownHostException
+        Link unkownHostLink = new Link("http://x.x.x.x");
+        unkownHostLink.checkIfDead(true);
+        assertEquals("UnknownHostException", unkownHostLink.getResponseCode());
     }
 
     @Test
