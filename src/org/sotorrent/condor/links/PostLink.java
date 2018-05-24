@@ -22,7 +22,9 @@ public class PostLink extends Link {
     private int postTypeId;
     private int postHistoryId;
 
-    private static final CSVFormat csvFormatPostLink, csvFormatClassifiedPostLink;
+    public static final String FILENAME = "PostLinks.csv";
+    private static CSVFormat csvFormatPostLink;
+    static final CSVFormat csvFormatClassifiedPostLink;
     static {
         // configure CSV format for post links
         csvFormatPostLink = CSVFormat.DEFAULT
@@ -71,7 +73,7 @@ public class PostLink extends Link {
     }
 
     public static void writeToCSV(List<Link> postLinks, Path outputDir) {
-        File outputFile = Paths.get(outputDir.toString(), "PostsLinks.csv").toFile();
+        File outputFile = Paths.get(outputDir.toString(), FILENAME).toFile();
         try {
             FileUtils.ensureDirectoryExists(outputDir);
             FileUtils.deleteFileIfExists(outputFile.toPath());

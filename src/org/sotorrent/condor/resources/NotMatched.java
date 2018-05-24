@@ -11,7 +11,7 @@ public class NotMatched extends DeveloperResource
     public NotMatched(Set<DeveloperResource> developerResources) 
     {
         super(developerResources.stream()
-                .flatMap(dr -> dr.rootDomains())
+                .flatMap(DeveloperResource::rootDomains)
                 .collect(Collectors.toSet()));
     }
 

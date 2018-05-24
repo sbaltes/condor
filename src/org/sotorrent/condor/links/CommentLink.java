@@ -22,7 +22,9 @@ public class CommentLink extends Link {
     private int postTypeId;
     private int commentId;
 
-    private static final CSVFormat csvFormatCommentLink, csvFormatClassifiedCommentLink;
+    public static final String FILENAME = "CommentLinks.csv";
+    private static final CSVFormat csvFormatCommentLink;
+    static final CSVFormat csvFormatClassifiedCommentLink;
     static {
         // configure CSV format for comment links
         csvFormatCommentLink = CSVFormat.DEFAULT
@@ -70,7 +72,7 @@ public class CommentLink extends Link {
     }
 
     public static void writeToCSV(List<Link> commentLinks, Path outputDir) {
-        File outputFile = Paths.get(outputDir.toString(), "CommentLinks.csv").toFile();
+        File outputFile = Paths.get(outputDir.toString(), FILENAME).toFile();
         try {
             FileUtils.ensureDirectoryExists(outputDir);
             FileUtils.deleteFileIfExists(outputFile.toPath());

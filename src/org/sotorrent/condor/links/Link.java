@@ -17,6 +17,8 @@ import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
 import static org.sotorrent.condor.MatchDeveloperResources.logger;
+import static org.sotorrent.condor.links.CommentLink.csvFormatClassifiedCommentLink;
+import static org.sotorrent.condor.links.PostLink.csvFormatClassifiedPostLink;
 
 /**
  * Abstract superclass for post and comment links.
@@ -403,5 +405,47 @@ public class Link {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static Map<String, Integer> checkProgress(Path pathToCommentLinkCSVFile, Path pathToPostLinkCSVFile) {
+        int total = 0;
+        int matched = 0;
+
+        try (CSVParser csvParser = new CSVParser(new FileReader(pathToCommentLinkCSVFile.toFile()),
+                csvFormatClassifiedCommentLink.withFirstRecordAsHeader())) {
+            logger.info("Reading classified comment links from CSV file " + pathToCommentLinkCSVFile.toFile().toString() + " ...");
+            for (CSVRecord currentRecord : csvParser) {
+                total++;
+                if(checkIfMatched(currentRecord)) {
+                    matched++;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try (CSVParser csvParser = new CSVParser(new FileReader(pathToPostLinkCSVFile.toFile()),
+                csvFormatClassifiedPostLink.withFirstRecordAsHeader())) {
+            logger.info("Reading classified post links from CSV file " + pathToPostLinkCSVFile.toFile().toString() + " ...");
+            for (CSVRecord currentRecord : csvParser) {
+                total++;
+                if(checkIfMatched(currentRecord)) {
+                    matched++;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        Map<String, Integer> progress = new HashMap<>();
+        progress.put("total", total);
+        progress.put("matched", matched);
+
+        return progress;
+    }
+
+    private static boolean checkIfMatched(CSVRecord csvRecord) {
+        String resource = csvRecord.get("MatchedDeveloperResource");
+        return (!(resource.length() == 0 || resource.equals("NotMatched")));
     }
 }
