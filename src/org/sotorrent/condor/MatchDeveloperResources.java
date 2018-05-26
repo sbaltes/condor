@@ -17,6 +17,8 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 public class MatchDeveloperResources {
+    //TODO: move command-line paramters to properties file?
+
     public static Logger logger = null;
     static {
         // configure logger
