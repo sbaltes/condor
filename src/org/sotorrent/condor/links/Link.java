@@ -1,13 +1,12 @@
 package org.sotorrent.condor.links;
 
 import com.google.gson.JsonParser;
+import org.apache.commons.csv.*;
+import org.sotorrent.condor.resources.DeveloperResource;
 import org.sotorrent.util.FileUtils;
 import org.sotorrent.util.HttpUtils;
 import org.sotorrent.util.Patterns;
-import org.apache.commons.csv.*;
-import org.sotorrent.condor.resources.DeveloperResource;
 
-import javax.net.ssl.SSLHandshakeException;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.nio.file.Path;
@@ -434,18 +433,15 @@ public class Link {
     }
 
     public static Map<String, Integer> checkProgress(Path pathToCommentLinkCSVFile, Path pathToPostLinkCSVFile) {
-        int total = 0;
-        int matched = 0;
+        Map<String, Integer> progress = new HashMap<>();
 
         try (CSVParser csvParser = new CSVParser(new FileReader(pathToCommentLinkCSVFile.toFile()),
                 csvFormatClassifiedCommentLink.withFirstRecordAsHeader())) {
             logger.info("Reading classified comment links from CSV file " + pathToCommentLinkCSVFile.toFile().toString() + " ...");
-            for (CSVRecord currentRecord : csvParser) {
-                total++;
-                if(checkIfMatched(currentRecord)) {
-                    matched++;
-                }
-            }
+            Map<String, Integer> commentLinkProgress = checkProgress(csvParser.iterator());
+            progress.put("total", commentLinkProgress.get("total"));
+            progress.put("matched", commentLinkProgress.get("matched"));
+            progress.put("dead", commentLinkProgress.get("dead"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -453,25 +449,44 @@ public class Link {
         try (CSVParser csvParser = new CSVParser(new FileReader(pathToPostLinkCSVFile.toFile()),
                 csvFormatClassifiedPostLink.withFirstRecordAsHeader())) {
             logger.info("Reading classified post links from CSV file " + pathToPostLinkCSVFile.toFile().toString() + " ...");
-            for (CSVRecord currentRecord : csvParser) {
-                total++;
-                if(checkIfMatched(currentRecord)) {
-                    matched++;
-                }
-            }
+            Map<String, Integer> postLinkProgress = checkProgress(csvParser.iterator());
+            progress.put("total", progress.get("total") + postLinkProgress.get("total"));
+            progress.put("matched", progress.get("matched") + postLinkProgress.get("matched"));
+            progress.put("dead", progress.get("dead") + postLinkProgress.get("dead"));
         } catch (IOException e) {
             e.printStackTrace();
         }
 
+        return progress;
+    }
+
+    private static Map<String, Integer> checkProgress(Iterator<CSVRecord> csvRecordIterator) {
+        int total = 0;
+        int matched = 0;
+        int dead = 0;
+        while (csvRecordIterator.hasNext()) {
+            CSVRecord currentRecord = csvRecordIterator.next();
+            total++;
+            if(checkIfMatched(currentRecord)) {
+                matched++;
+            }
+            if (checkIDead(currentRecord)) {
+                dead++;
+            }
+        }
         Map<String, Integer> progress = new HashMap<>();
         progress.put("total", total);
         progress.put("matched", matched);
-
+        progress.put("dead", dead);
         return progress;
     }
 
     private static boolean checkIfMatched(CSVRecord csvRecord) {
         String resource = csvRecord.get("MatchedDeveloperResource");
-        return (!(resource.length() == 0 || resource.equals("NotMatched")));
+        return (!checkIDead(csvRecord) && !(resource.length() == 0) && !resource.equals("NotMatched"));
+    }
+
+    private static boolean checkIDead(CSVRecord csvRecord) {
+        return Boolean.parseBoolean(csvRecord.get("Dead"));
     }
 }

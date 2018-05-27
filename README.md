@@ -12,17 +12,17 @@ using a heuristic based on domains and paths.
 
 Windows:
 
-    mvn exec:java -D"exec.mainClass"="org.sotorrent.condor.MatchDeveloperResources" -D"exec.args"="-p data-collection/data/java_regex_posts.csv -c data-collection/data/java_regex_comments.csv -o data-collection/output"
+    mvn exec:java -D"exec.mainClass"="org.sotorrent.condor.MatchDeveloperResources" -D"exec.args"="-p data-collection/data/java_regex_posts_validated.csv -c data-collection/data/java_regex_comments.csv -o data-collection/output"
 
 Linux/macOS:
 
-    mvn exec:java -Dexec.mainClass="org.sotorrent.condor.MatchDeveloperResources" -Dexec.args="-p data-collection/data/java_regex_posts.csv -c data-collection/data/java_regex_comments.csv -o data-collection/output" output.log 2>&1
+    mvn exec:java -Dexec.mainClass="org.sotorrent.condor.MatchDeveloperResources" -Dexec.args="-p data-collection/data/java_regex_posts_validated.csv -c data-collection/data/java_regex_comments.csv -o data-collection/output" output.log 2>&1
 
 #### Parameters
 
-`-p` Path to CSV file with post links.
+`-p` Path to CSV file with validated post links.
 
-`-c` Path to CSV file with comment links.
+`-c` Path to CSV file with validated comment links.
 
 `-o` Path to output directory.
 

@@ -92,7 +92,6 @@ public class ValidateLinks {
     private static void writeLinks(List<Link> links, Path outputDirPath) {
         logger.info(resolveCount + " unique links have been resolved.");
         logger.info(deadCount + " unique links were dead.");
-
         logger.info("Writing validated unique links to CSV file " + outputDirPath.toFile().getName() + " ...");
         Link.writeToCSV(links, outputDirPath);
     }

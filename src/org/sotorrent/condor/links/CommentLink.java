@@ -1,7 +1,7 @@
 package org.sotorrent.condor.links;
 
-import org.sotorrent.util.FileUtils;
 import org.apache.commons.csv.*;
+import org.sotorrent.util.FileUtils;
 
 import java.io.File;
 import java.io.FileReader;
@@ -21,6 +21,7 @@ public class CommentLink extends Link {
     private int postId;
     private int postTypeId;
     private int commentId;
+    private boolean dead;
 
     public static final String FILENAME = "CommentLinks.csv";
     private static final CSVFormat csvFormatCommentLink;
@@ -28,7 +29,7 @@ public class CommentLink extends Link {
     static {
         // configure CSV format for comment links
         csvFormatCommentLink = CSVFormat.DEFAULT
-                .withHeader("PostId", "PostTypeId", "CommentId", "Url")
+                .withHeader("PostId", "PostTypeId", "CommentId", "Url", "Dead")
                 .withDelimiter(',')
                 .withQuote('"')
                 .withQuoteMode(QuoteMode.MINIMAL)
@@ -36,18 +37,19 @@ public class CommentLink extends Link {
                 .withFirstRecordAsHeader();
         // configure CSV format for classified comment links
         csvFormatClassifiedCommentLink = CSVFormat.DEFAULT
-                .withHeader("PostId", "PostTypeId", "CommentId", "Protocol", "RootDomain", "CompleteDomain", "Path", "Url", "MatchedDeveloperResource")
+                .withHeader("PostId", "PostTypeId", "CommentId", "Protocol", "RootDomain", "CompleteDomain", "Path", "Url", "Dead", "MatchedDeveloperResource")
                 .withDelimiter(',')
                 .withQuote('"')
                 .withQuoteMode(QuoteMode.MINIMAL)
                 .withEscape('\\');
     }
 
-    private CommentLink(int postId, int postTypeId, int commentId, String url) {
+    private CommentLink(int postId, int postTypeId, int commentId, String url, boolean dead) {
         super(url);
         this.postId = postId;
         this.postTypeId = postTypeId;
         this.commentId = commentId;
+        this.dead = dead;
     }
 
     public static List<Link> readFromCSV(Path pathToCSVFile) {
@@ -61,8 +63,9 @@ public class CommentLink extends Link {
                 int postTypeId = Integer.parseInt(currentRecord.get("PostTypeId"));
                 int commentId = Integer.parseInt(currentRecord.get("CommentId"));
                 String url = currentRecord.get("Url");
+                boolean dead = Boolean.parseBoolean(currentRecord.get("Dead"));
 
-                commentLinks.add(new CommentLink(postId, postTypeId, commentId, url));
+                commentLinks.add(new CommentLink(postId, postTypeId, commentId, url, dead));
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -87,7 +90,7 @@ public class CommentLink extends Link {
                 CommentLink commentLink = (CommentLink) link;
                 csvPrinter.printRecord(commentLink.postId, commentLink.postTypeId, commentLink.commentId,
                         commentLink.protocol, commentLink.rootDomain, commentLink.completeDomain,
-                        commentLink.path, commentLink.url,
+                        commentLink.path, commentLink.url, commentLink.dead,
                         commentLink.matchedDeveloperResource
                 );
             }

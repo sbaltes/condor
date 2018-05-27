@@ -21,6 +21,7 @@ public class PostLink extends Link {
     private int postId;
     private int postTypeId;
     private int postHistoryId;
+    private boolean dead;
 
     public static final String FILENAME = "PostLinks.csv";
     private static CSVFormat csvFormatPostLink;
@@ -28,7 +29,7 @@ public class PostLink extends Link {
     static {
         // configure CSV format for post links
         csvFormatPostLink = CSVFormat.DEFAULT
-                .withHeader("PostId", "PostTypeId", "PostHistoryId", "Url")
+                .withHeader("PostId", "PostTypeId", "PostHistoryId", "Url", "Dead")
                 .withDelimiter(',')
                 .withQuote('"')
                 .withQuoteMode(QuoteMode.MINIMAL)
@@ -37,18 +38,19 @@ public class PostLink extends Link {
 
         // configure CSV format for classified post links
         csvFormatClassifiedPostLink = CSVFormat.DEFAULT
-                .withHeader("PostId", "PostTypeId", "PostHistoryId", "Protocol", "RootDomain", "CompleteDomain", "Path", "Url", "MatchedDeveloperResource")
+                .withHeader("PostId", "PostTypeId", "PostHistoryId", "Protocol", "RootDomain", "CompleteDomain", "Path", "Url", "Dead", "MatchedDeveloperResource")
                 .withDelimiter(',')
                 .withQuote('"')
                 .withQuoteMode(QuoteMode.MINIMAL)
                 .withEscape('\\');
     }
 
-    private PostLink(int postId, int postTypeId, int postHistoryId, String url) {
+    private PostLink(int postId, int postTypeId, int postHistoryId, String url, boolean dead) {
         super(url);
         this.postId = postId;
         this.postTypeId = postTypeId;
         this.postHistoryId = postHistoryId;
+        this.dead = dead;
     }
 
     public static List<Link> readFromCSV(Path pathToCSVFile) {
@@ -62,8 +64,9 @@ public class PostLink extends Link {
                 int postTypeId = Integer.parseInt(currentRecord.get("PostTypeId"));
                 int postHistoryId = Integer.parseInt(currentRecord.get("PostHistoryId"));
                 String url = currentRecord.get("Url");
+                boolean dead = Boolean.parseBoolean(currentRecord.get("Dead"));
 
-                postLinks.add(new PostLink(postId, postTypeId, postHistoryId, url));
+                postLinks.add(new PostLink(postId, postTypeId, postHistoryId, url, dead));
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -88,7 +91,7 @@ public class PostLink extends Link {
                 PostLink postLink = (PostLink) link;
                 csvPrinter.printRecord(postLink.postId, postLink.postTypeId, postLink.postHistoryId,
                         postLink.protocol, postLink.rootDomain, postLink.completeDomain,
-                        postLink.path, postLink.url, postLink.matchedDeveloperResource
+                        postLink.path, postLink.url, postLink.dead, postLink.matchedDeveloperResource
                 );
             }
         } catch (IOException e) {
