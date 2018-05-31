@@ -60,7 +60,7 @@ abstract public class DeveloperResource
         return false;
     }
     
-    public void addMatchedLink(Link pLink)
+    void addMatchedLink(Link pLink)
     {
     	aMatchedLinks.add(pLink);
     }
@@ -78,6 +78,10 @@ abstract public class DeveloperResource
                 new Wikipedia(),
                 new OtherAPI()
         );
+    }
+
+    public Set<String> getRootDomains() {
+        return aRootDomains;
     }
 
     @Override

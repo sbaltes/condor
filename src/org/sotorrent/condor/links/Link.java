@@ -442,6 +442,7 @@ public class Link {
             progress.put("total", commentLinkProgress.get("total"));
             progress.put("matched", commentLinkProgress.get("matched"));
             progress.put("dead", commentLinkProgress.get("dead"));
+            progress.put("rootDomains", commentLinkProgress.get("rootDomains"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -453,6 +454,7 @@ public class Link {
             progress.put("total", progress.get("total") + postLinkProgress.get("total"));
             progress.put("matched", progress.get("matched") + postLinkProgress.get("matched"));
             progress.put("dead", progress.get("dead") + postLinkProgress.get("dead"));
+            progress.put("rootDomains", progress.get("rootDomains") + postLinkProgress.get("rootDomains"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -464,6 +466,8 @@ public class Link {
         int total = 0;
         int matched = 0;
         int dead = 0;
+        Set<String> rootDomains = new HashSet<>();
+
         while (csvRecordIterator.hasNext()) {
             CSVRecord currentRecord = csvRecordIterator.next();
             total++;
@@ -473,11 +477,15 @@ public class Link {
             if (checkIDead(currentRecord)) {
                 dead++;
             }
+            rootDomains.add(currentRecord.get("RootDomain"));
         }
+
         Map<String, Integer> progress = new HashMap<>();
         progress.put("total", total);
         progress.put("matched", matched);
         progress.put("dead", dead);
+        progress.put("rootDomains", rootDomains.size());
+
         return progress;
     }
 
