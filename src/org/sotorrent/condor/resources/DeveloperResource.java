@@ -13,18 +13,16 @@ import java.util.stream.Stream;
  */
 abstract public class DeveloperResource 
 {
-    private final Set<String> aRootDomains;
+    private Set<String> aRootDomains;
     private Pattern aResourcePattern;
     private List<Link> aMatchedLinks = new LinkedList<>();
 
-    DeveloperResource(String... pRootDomains) 
-    {
-    	aRootDomains = Sets.newHashSet(pRootDomains);
+    DeveloperResource(String... pRootDomains) {
+        setRootDomains(Sets.newHashSet(pRootDomains));
     }
     
-    DeveloperResource(Set<String> pRootDomains) 
-    {
-    	aRootDomains = new HashSet<>(pRootDomains);
+    DeveloperResource(Set<String> pRootDomains) {
+    	setRootDomains(new HashSet<>(pRootDomains));
     }
     
     Stream<String> rootDomains()
@@ -38,7 +36,9 @@ abstract public class DeveloperResource
     }
 
     void createResourcePattern(String[] urlPatterns) {
-        aResourcePattern = Pattern.compile(Arrays.stream(urlPatterns).collect(Collectors.joining("|")));
+        aResourcePattern = Pattern.compile(Arrays.stream(urlPatterns).collect(Collectors.joining("|")),
+                Pattern.CASE_INSENSITIVE
+        );
     }
 
     public boolean match(Link link) {
@@ -71,6 +71,7 @@ abstract public class DeveloperResource
 
     public static Set<DeveloperResource> createDeveloperResources() {
         return Sets.newHashSet(
+                new Dead(),
                 new StackOverflow(),
                 new JavaAPI(),
                 new JavaReference(),
@@ -79,12 +80,19 @@ abstract public class DeveloperResource
                 new OtherAPI(),
                 new OtherReference(),
                 new OtherForum(),
-                new NoDocumentation()
+                new NotDocumentation()
         );
     }
 
     public Set<String> getRootDomains() {
         return aRootDomains;
+    }
+
+    private void setRootDomains(Set<String> pRootDomains) {
+        aRootDomains = new HashSet<>(pRootDomains)
+                .stream()
+                .map(String::toLowerCase)
+                .collect(Collectors.toSet());
     }
 
     @Override

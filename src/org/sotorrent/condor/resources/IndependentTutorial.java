@@ -8,11 +8,13 @@ public class IndependentTutorial extends DeveloperResource
 {
     IndependentTutorial() 
     {
-    	super("regular-expressions.info", "vogella.com", "vogella.de", "tutorialspoint.com");
+    	super("regular-expressions.info", "vogella.com", "tutorialspoint.com", "rexegg.com");
         createResourcePattern(new String[]{
-                "^https?://(www\\.)?regular-expressions\\.info.*",
-                "^https?://www\\.vogella\\.(com|de).*",
-                "^https?://www\\.tutorialspoint\\.com.*",
+                "^https?://(www\\.)?regular-expressions\\.info.+\\.htm.*",
+                "^https?://(www\\.)?vogella\\.com.+\\.htm.*",
+                "^https?://(www\\.)?tutorialspoint\\.com.+\\.htm.*",
+                "^https?://(www\\.)?tutorialspoint\\.com/(jackson|java_xml).*",
+                "^https?://(www\\.)?rexegg.com/.+\\.htm.*"
         });
     }
 }

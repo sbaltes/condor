@@ -8,10 +8,12 @@ public class OtherAPI extends DeveloperResource
 {
     OtherAPI() 
     {
-    	super("apache.org");
+    	super("apache.org", "sourceforge.net", "jsoup.org");
         createResourcePattern(new String[]{
-                "https?://.*apache\\.org.*(api-\\d).*\\.html.*",
-                "https?://.*apache\\.org.*(api|core|proper|java)(docs)?/.*\\.html.*"
+                "https?://.*apache\\.org.*(api-\\d).*\\.htm.*",
+                "https?://.*apache\\.org.*(api|core|proper|java)(docs)?/.*\\.htm.*",
+                "https?://.+\\.sourceforge\\.net/(apidocs|javadoc).+\\.htm.*",
+                "https?://jsoup\\.org/apidocs.*"
         });
     }
 }

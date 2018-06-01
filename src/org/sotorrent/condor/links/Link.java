@@ -156,7 +156,7 @@ public class Link {
         if (!urlMatcher.find()) {
             throw new IllegalArgumentException("Malformed URL: " + url);
         }
-        this.url = urlMatcher.group(0);
+        this.url = urlMatcher.group(0).toLowerCase();
         this.protocol = Patterns.extractProtocolFromUrl(this.url);
         this.completeDomain = Patterns.extractCompleteDomainFromUrl(this.url);
         this.rootDomain = Patterns.extractRootDomainFromCompleteDomain(completeDomain);
