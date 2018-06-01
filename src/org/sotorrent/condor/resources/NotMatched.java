@@ -6,6 +6,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Represents links to paths of root domains for which developer resources exist,
+ * but which have not been matched by one of the regular expressions.
+ */
 public class NotMatched extends DeveloperResource 
 {
     public NotMatched(Set<DeveloperResource> developerResources) 

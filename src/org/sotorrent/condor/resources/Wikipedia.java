@@ -9,7 +9,7 @@ public class Wikipedia extends DeveloperResource
     {
     	super("wikipedia.org");
         createResourcePattern(new String[]{
-                "^https?://en\\.wikipedia\\.org.*"
+                "^https?://[a-zA-Z]{2}\\.wikipedia\\.org.*"
         });
     }
 }

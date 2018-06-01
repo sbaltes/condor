@@ -10,7 +10,7 @@ public class JavaAPI extends DeveloperResource
     {
     	super("oracle.com", "sun.com");
         createResourcePattern(new String[]{
-                "^https?://(docs\\.oracle\\.com|java\\.sun\\.com)/java(s|e)e/[\\d\\.]+/docs/api/.*"
+                "^https?://((docs|download)\\.oracle\\.com|java\\.sun\\.com)/(java|j2)(s|e)e/[\\d\\.,]+(/docs)?/api/.*"
         });
     }
 }

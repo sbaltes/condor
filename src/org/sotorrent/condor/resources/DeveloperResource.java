@@ -76,7 +76,10 @@ abstract public class DeveloperResource
                 new JavaReference(),
                 new IndependentTutorial(),
                 new Wikipedia(),
-                new OtherAPI()
+                new OtherAPI(),
+                new OtherReference(),
+                new OtherForum(),
+                new NoDocumentation()
         );
     }
 
