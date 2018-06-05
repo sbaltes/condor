@@ -10,7 +10,7 @@ public class OtherForum extends DeveloperResource
         super("oracle.com", "sun.com");
 
         createResourcePattern(new String[]{
-                "^https?://forums\\.(oracle|sun)\\.com/.+"
+                "^https?://forums\\.(oracle|sun)\\.com.*"
         });
     }
 }

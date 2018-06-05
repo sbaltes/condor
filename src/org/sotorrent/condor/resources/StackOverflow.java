@@ -13,9 +13,9 @@ public class StackOverflow extends DeveloperResource
         createResourcePattern(new String[]{
                 "^https?://stackoverflow\\.com/(a|q|questions)/[\\d]+",
                 "^https?://stackoverflow\\.com/questions/[\\d]+/[^\\s/\\#]+",
-                "^https?://stackoverflow\\.com/revisions/.*",
-                "^https?://stackoverflow\\.com/posts/\\d+/revisions",
-                "^https?://stackoverflow\\.com/posts/comments/.*"
+                "^https?://stackoverflow\\.com/revisions.*",
+                "^https?://stackoverflow\\.com/posts/\\d+/revisions.*",
+                "^https?://stackoverflow\\.com/posts/comments.*"
         });
     }
 }
