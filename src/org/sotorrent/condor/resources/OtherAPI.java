@@ -1,8 +1,7 @@
 package org.sotorrent.condor.resources;
 
 /**
- * Represents API documentation, but not for the Java SE 
- * libraries.
+ * Represents API documentation, but not for the JDK.
  */
 public class OtherAPI extends DeveloperResource 
 {
