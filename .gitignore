@@ -59,3 +59,4 @@ target/
 *.lck
 #input/*
 output/*
+/paper/icse19-condor.pdf
