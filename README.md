@@ -12,11 +12,11 @@ using a heuristic based on domains and paths.
 
 Windows:
 
-    mvn exec:java -D"exec.mainClass"="org.sotorrent.condor.MatchDeveloperResources" -D"exec.args"="-p data-collection/data/java_regex_posts_validated.csv -c data-collection/data/java_regex_comments.csv -o data-collection/output"
+    mvn exec:java -D"exec.mainClass"="org.sotorrent.condor.MatchDeveloperResources" -D"exec.args"="-p data-collection/data/java_regex/Posts_validated.csv -c data-collection/data/java_regex/Comments.csv -o data-collection/output"
 
 Linux/macOS:
 
-    mvn exec:java -Dexec.mainClass="org.sotorrent.condor.MatchDeveloperResources" -Dexec.args="-p data-collection/data/java_regex_posts_validated.csv -c data-collection/data/java_regex_comments.csv -o data-collection/output" output.log 2>&1
+    mvn exec:java -Dexec.mainClass="org.sotorrent.condor.MatchDeveloperResources" -Dexec.args="-p data-collection/data/java_regex/Posts_validated.csv -c data-collection/data/java_regex/Comments.csv -o data-collection/output" output.log 2>&1
 
 #### Parameters
 
@@ -32,11 +32,11 @@ Linux/macOS:
 
 Windows:
 
-    mvn exec:java -D"exec.mainClass"="org.sotorrent.condor.ValidateLinks" -D"exec.args"="-u data-collection/data/java_regex_unique_links.csv -o data-collection/output"
+    mvn exec:java -D"exec.mainClass"="org.sotorrent.condor.ValidateLinks" -D"exec.args"="-u data-collection/data/java_regex/unique_links.csv -o data-collection/output"
 
 Linux/macOS:
 
-     mvn exec:java -Dexec.mainClass="org.sotorrent.condor.ValidateLinks" -Dexec.args="-u data-collection/data/java_regex_unique_links.csv -o output" > output.log 2>&1
+     mvn exec:java -Dexec.mainClass="org.sotorrent.condor.ValidateLinks" -Dexec.args="-u data-collection/data/java_regex/unique_links.csv -o output" > output.log 2>&1
 
 #### Parameters
 

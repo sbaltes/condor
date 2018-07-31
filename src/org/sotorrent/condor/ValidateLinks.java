@@ -61,7 +61,7 @@ public class ValidateLinks {
 
         logger.info("Validating unique links...");
 
-        int logPace = links.size()/100;
+        int logPace = links.size()/1000;
 
         for (int i = 0; i < links.size(); i++) {
             Link link = links.get(i);
