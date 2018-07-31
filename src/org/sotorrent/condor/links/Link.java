@@ -268,7 +268,13 @@ public class Link {
                                 .lines()
                                 .parallel()
                                 .collect(Collectors.joining("\n"));
-                        longUrl = new JsonParser().parse(response).getAsJsonObject().get("longUrl").getAsString();
+                        longUrl = new JsonParser()
+                                .parse(response)
+                                .getAsJsonObject()
+                                .get("longUrl")
+                                .getAsString();
+                    } catch (NullPointerException e) {
+                        logger.warning("Expanding goo.gl URL failed for " + this.url);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -301,6 +307,8 @@ public class Link {
                                 .get("expand").getAsJsonArray()
                                 .get(0).getAsJsonObject()
                                 .get("long_url").getAsString();
+                    } catch (NullPointerException e) {
+                        logger.warning("Expanding goo.gl URL failed for " + this.url);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
