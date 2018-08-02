@@ -60,17 +60,12 @@ public class ValidateLinks {
 
         logger.info("Validating unique links...");
 
-        int logPace = 1; //Math.max(links.size(), links.size()/1000);
-
         for (int i = 0; i < links.size(); i++) {
             Link link = links.get(i);
 
-            // log only every LOG_PACE record
-            if (i == 0 || i == links.size()-1 || i % logPace == 0) {
-                // Locale.ROOT -> force '.' as decimal separator
-                String progress = String.format(Locale.ROOT, "%.2f%%", (((double)(i+1))/links.size()*100));
-                logger.info("Validating unique link " + (i+1) + " of " + links.size() + " (" + progress + ")");
-            }
+            // Locale.ROOT -> force '.' as decimal separator
+            String progress = String.format(Locale.ROOT, "%.2f%%", (((double)(i+1))/links.size()*100));
+            logger.info("Validating unique link " + (i+1) + " of " + links.size() + " (" + progress + ")");
 
             if (link.checkIfDead(true, properties)) {
                 // link is dead

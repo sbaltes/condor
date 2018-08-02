@@ -36,7 +36,7 @@ Windows:
 
 Linux/macOS:
 
-     mvn exec:java -Dexec.mainClass="org.sotorrent.condor.ValidateLinks" -Dexec.args="-u data-collection/data/java_regex/unique_links.csv -o output" > output.log 2>&1
+    mvn exec:java -Dexec.mainClass="org.sotorrent.condor.ValidateLinks" -Dexec.args="-u data-collection/data/java_regex/unique_links.csv -o output" > output.log 2>&1
 
 #### Parameters
 
