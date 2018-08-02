@@ -5,7 +5,7 @@
     <name>Condor</name>
     <groupId>org.sotorrent</groupId>
     <artifactId>condor</artifactId>
-    <version>0.0.2</version>
+    <version>0.0.3</version>
     <url>https://github.com/prmr/Condor</url>
 
     <properties>
