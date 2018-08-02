@@ -14,7 +14,6 @@ import java.util.Properties;
 import static org.sotorrent.condor.MatchDeveloperResources.logger;
 
 public class ValidateLinks {
-    private static int resolveCount = 0;
     private static int deadCount = 0;
 
     public static void main (String[] args) {
@@ -47,7 +46,7 @@ public class ValidateLinks {
         Path outputDirPath = Paths.get(commandLine.getOptionValue("output-dir"));
 
         // read properties
-        Properties properties = new Properties();
+        final Properties properties = new Properties();
         try {
             properties.load(new FileInputStream("condor.properties"));
         } catch (IOException e) {
@@ -61,7 +60,7 @@ public class ValidateLinks {
 
         logger.info("Validating unique links...");
 
-        int logPace = Math.max(links.size(), links.size()/1000);
+        int logPace = 1; //Math.max(links.size(), links.size()/1000);
 
         for (int i = 0; i < links.size(); i++) {
             Link link = links.get(i);
@@ -73,14 +72,7 @@ public class ValidateLinks {
                 logger.info("Validating unique link " + (i+1) + " of " + links.size() + " (" + progress + ")");
             }
 
-            if (link.resolveShortLink(properties)) {
-                // link has been resolved
-                resolveCount++;
-                if (link.checkIfDead(false)) {
-                    // check shortened link, not follow redirect
-                    deadCount++;
-                }
-            } else if (link.checkIfDead(true)) {
+            if (link.checkIfDead(true, properties)) {
                 // link is dead
                 deadCount++;
             }
@@ -90,7 +82,6 @@ public class ValidateLinks {
     }
 
     private static void writeLinks(List<Link> links, Path outputDirPath) {
-        logger.info(resolveCount + " unique links have been resolved.");
         logger.info(deadCount + " unique links were dead.");
         logger.info("Writing validated unique links to CSV file " + outputDirPath.toFile().getName() + " ...");
         Link.writeToCSV(links, outputDirPath);

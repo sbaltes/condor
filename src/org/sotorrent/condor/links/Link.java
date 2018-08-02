@@ -25,7 +25,6 @@ import static org.sotorrent.condor.links.PostLink.csvFormatClassifiedPostLink;
  */
 public class Link {
     private static Random rand = new Random();
-    private static final int requestTimeout = 10000;
     private static boolean onlyProcessRateLimitFailures = false;
 
     private static final CSVFormat csvFormatUniqueLink, csvFormatValidatedUniqueLink;
@@ -40,21 +39,11 @@ public class Link {
                 .withFirstRecordAsHeader();
         // configure CSV format for resolved unique links
         csvFormatValidatedUniqueLink = CSVFormat.DEFAULT
-                .withHeader("Protocol", "RootDomain", "CompleteDomain", "Path", "Url", "Dead", "ResponseCode", "Resolved", "ResolvedUrl", "ResolvedUrlDead", "ResolvedUrlResponseCode")
+                .withHeader("Protocol", "RootDomain", "CompleteDomain", "Path", "Url", "Dead", "ResponseCode")
                 .withDelimiter(',')
                 .withQuote('"')
                 .withQuoteMode(QuoteMode.MINIMAL)
                 .withEscape('\\');
-    }
-
-    private static Set<String> linkShorteningDomains;
-    static {
-        linkShorteningDomains = new HashSet<>();
-        linkShorteningDomains.add("goo.gl");
-        linkShorteningDomains.add("bit.ly");
-        linkShorteningDomains.add("t.co");
-        linkShorteningDomains.add("youtu.be");
-        linkShorteningDomains.add("tinyurl.com");
     }
 
     private static Set<String> deadRootDomains;
@@ -80,22 +69,16 @@ public class Link {
 
     private boolean dead;
     private String responseCode;
-    private boolean resolved;
-
-    private Link resolvedLink;
 
     public Link(String url) {
         this.matchedDeveloperResource = null;
         this.dead = false;
         this.responseCode = "-1";
-        this.resolved = false;
-        this.resolvedLink = null;
         setUrl(url);
     }
 
     public Link(String protocol, String rootDomain, String completeDomain, String path, String url,
-         boolean dead, String responseCode,
-         boolean resolved, String resolvedUrl, Boolean resolvedUrlDead, String resolvedUrlResponseCode) {
+                boolean dead, String responseCode) {
         this.protocol = protocol;
         this.rootDomain = rootDomain;
         this.completeDomain = completeDomain;
@@ -103,12 +86,6 @@ public class Link {
         this.url = url;
         this.dead = dead;
         this.responseCode = responseCode;
-        this.resolved = resolved;
-        if (resolvedUrl.length() > 0) {
-            this.resolvedLink = new Link(resolvedUrl);
-            this.resolvedLink.dead = resolvedUrlDead;
-            this.resolvedLink.responseCode = resolvedUrlResponseCode;
-        }
     }
 
     public String getProtocol() {
@@ -135,20 +112,12 @@ public class Link {
         return matchedDeveloperResource;
     }
 
-    public Link getResolvedLink() {
-        return resolvedLink;
-    }
-
     public String getResponseCode() {
         return responseCode;
     }
 
     public boolean isDead() {
         return dead;
-    }
-
-    public boolean isResolved() {
-        return resolved;
     }
 
     public void setUrl(String url) {
@@ -175,23 +144,17 @@ public class Link {
         this.responseCode = responseCode;
     }
 
-    public void setResolved(boolean resolved) {
-        this.resolved = resolved;
-    }
-
-    public void setResolvedLink(Link resolvedLink) {
-        this.resolvedLink = resolvedLink;
-    }
-
-    private void wait(int min, int max) {
+    private void wait(Properties properties) {
+        int minDelay = Integer.parseInt(properties.getProperty("min-delay"));
+        int maxDelay = Integer.parseInt(properties.getProperty("max-delay"));
         try {
-            Thread.sleep(rand.nextInt(max-min) + min);
+            Thread.sleep(rand.nextInt(maxDelay-minDelay) + minDelay);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
 
-    public boolean checkIfDead(boolean followRedirects) {
+    public boolean checkIfDead(boolean followRedirects, Properties properties) {
         if (Link.onlyProcessRateLimitFailures && !this.responseCode.equals("429")) {
             return false;
         }
@@ -202,10 +165,18 @@ public class Link {
             return true;
         }
 
+        if (Patterns.isIpAddress(this.url)) {
+            this.dead = true;
+            this.responseCode = "IPAddress";
+            return true;
+        }
+
+        int requestTimeout = Integer.parseInt(properties.getProperty("request-timeout"));
+
         HttpURLConnection conn = null;
         boolean executeGetRequest = false; // try HEAD request first, if that fails try GET request
 
-        wait(50, 1000);  // wait between requests
+        wait(properties);  // wait between requests
         try {
             // try HEAD request first
             conn = HttpUtils.openHttpConnection(this.url, "HEAD", followRedirects, requestTimeout);
@@ -218,7 +189,7 @@ public class Link {
         }
 
         if (executeGetRequest) {
-            wait(50, 1000);  // wait between requests
+            wait(properties);  // wait between requests
             try {
                 // if HEAD request fails, try a GET request
                 conn = HttpUtils.openHttpConnection(this.url, "GET", followRedirects, requestTimeout);
@@ -235,144 +206,6 @@ public class Link {
 
         this.dead = true;
         return true;
-    }
-
-    public boolean resolveShortLink(Properties properties) {
-        if (!linkShorteningDomains.contains(rootDomain)
-                || (Link.onlyProcessRateLimitFailures && !this.responseCode.equals("429"))) {
-            return false;
-        }
-
-        wait(50, 1000);  // wait between requests
-
-        String longUrl = null;
-
-        switch (rootDomain) {
-            case "goo.gl": {
-                // see https://developers.google.com/url-shortener/v1/getting_started#expand
-                String apiUrl = String.format("https://www.googleapis.com/urlshortener/v1/url?key=%s&shortUrl=%s",
-                        properties.getProperty("googl-api-key"), this.url
-                );
-
-                HttpURLConnection conn = null;
-                try {
-                    conn = HttpUtils.openHttpConnection(apiUrl, "GET", true, requestTimeout);
-                    this.responseCode = Integer.toString(conn.getResponseCode());
-                } catch (IOException e) {
-                    this.responseCode = e.getClass().getSimpleName();
-                }
-
-                if (conn != null && HttpUtils.success(conn)) {
-                    try {
-                        String response = new BufferedReader(new InputStreamReader(conn.getInputStream()))
-                                .lines()
-                                .parallel()
-                                .collect(Collectors.joining("\n"));
-                        longUrl = new JsonParser()
-                                .parse(response)
-                                .getAsJsonObject()
-                                .get("longUrl")
-                                .getAsString();
-                    } catch (NullPointerException e) {
-                        logger.warning("Expanding goo.gl URL failed for " + this.url);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-                break;
-            }
-            case "bit.ly": {
-                // see https://dev.bitly.com/links.html
-                String apiUrl = String.format("https://api-ssl.bitly.com/v3/expand?access_token=%s&shortUrl=%s",
-                        properties.getProperty("bitly-access-token"), this.url
-                );
-
-                HttpURLConnection conn = null;
-                try {
-                    conn = HttpUtils.openHttpConnection(apiUrl, "GET", true, requestTimeout);
-                    this.responseCode = Integer.toString(conn.getResponseCode());
-                } catch (IOException e) {
-                    this.responseCode = e.getClass().getSimpleName();
-                }
-
-                if (conn != null  && HttpUtils.success(conn)) {
-                    try {
-                        String response = new BufferedReader(new InputStreamReader(conn.getInputStream()))
-                                .lines()
-                                .parallel()
-                                .collect(Collectors.joining("\n"));
-
-                        longUrl = new JsonParser().parse(response).getAsJsonObject()
-                                .get("data").getAsJsonObject()
-                                .get("expand").getAsJsonArray()
-                                .get(0).getAsJsonObject()
-                                .get("long_url").getAsString();
-                    } catch (NullPointerException e) {
-                        logger.warning("Expanding goo.gl URL failed for " + this.url);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-                break;
-            }
-            case "t.co": {
-                // see https://developer.twitter.com/en/docs/basics/tco
-                HttpURLConnection conn = null;
-                try {
-                    conn = HttpUtils.openHttpConnection(this.url, "GET", false, requestTimeout);
-                    this.responseCode = Integer.toString(conn.getResponseCode());
-                } catch (IOException e) {
-                    this.responseCode = e.getClass().getSimpleName();
-                }
-
-                if (conn != null && HttpUtils.success(conn)) {
-                    try {
-                        String response = new BufferedReader(new InputStreamReader(conn.getInputStream()))
-                                .lines()
-                                .parallel()
-                                .collect(Collectors.joining("\n"));
-
-                        // example:
-                        // <head><meta name="referrer" content="always"><noscript><META http-equiv="refresh" content="0;URL=http://youtu.be/8EYeX5PkDXQ?a"></noscript><title>http://youtu.be/8EYeX5PkDXQ?a</title></head><script>window.opener = null; location.replace("http:\/\/youtu.be\/8EYeX5PkDXQ?a")</script>
-                        response = response.substring(response.indexOf("URL=") + 4);
-                        longUrl = response.substring(0, response.indexOf("\">"));
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-                break;
-            }
-            case "youtu.be":
-                if (!checkIfDead(true)) {
-                    longUrl = "https://www.youtube.com/watch?v=" + path;
-                }
-                break;
-            case "tinyurl.com": {
-                HttpURLConnection conn = null;
-                try {
-                    conn = HttpUtils.openHttpConnection(this.url, "GET", false, requestTimeout);
-                    this.responseCode = Integer.toString(conn.getResponseCode());
-                } catch (IOException e) {
-                    this.responseCode = e.getClass().getSimpleName();
-                }
-
-                if (conn != null && HttpUtils.redirect(conn)) {
-                    longUrl = conn.getHeaderField("Location");
-                }
-                break;
-            }
-        }
-
-        if (longUrl != null) {
-            this.dead = false;
-            this.resolved = true;
-            this.resolvedLink = new Link(longUrl);
-            this.resolvedLink.checkIfDead(true);
-            return true;
-        } else {
-            this.resolved = false;
-            return false;
-        }
     }
 
     public static List<Link> readFromCSV(Path pathToCSVFile) {
@@ -396,15 +229,8 @@ public class Link {
                     String url = currentRecord.get("Url");
                     boolean dead = Boolean.valueOf(currentRecord.get("Dead"));
                     String responseCode = currentRecord.get("ResponseCode");
-                    boolean resolved = Boolean.valueOf(currentRecord.get("Resolved"));
-                    String resolvedUrl = currentRecord.get("ResolvedUrl");
-                    Boolean resolvedUrlDead = null;
-                    if (currentRecord.get("ResolvedUrlDead").length() > 0) {
-                        resolvedUrlDead = Boolean.valueOf(currentRecord.get("ResolvedUrlDead"));
-                    }
                     String resolvedUrlResponseCode = currentRecord.get("ResolvedUrlResponseCode");
-                    links.add(new Link(protocol, rootDomain, completeDomain, path, url, dead, responseCode,
-                            resolved, resolvedUrl, resolvedUrlDead, resolvedUrlResponseCode));
+                    links.add(new Link(protocol, rootDomain, completeDomain, path, url, dead, responseCode));
                 }
 
             }
@@ -429,10 +255,7 @@ public class Link {
             for (Link link : links) {
                 csvPrinter.printRecord(
                         link.protocol, link.rootDomain, link.completeDomain, link.path, link.url,
-                        link.dead, link.responseCode, link.resolved,
-                        link.resolvedLink == null ? "" : link.resolvedLink.url,
-                        link.resolvedLink == null ? "" : link.resolvedLink.dead,
-                        link.resolvedLink == null ? "" : link.resolvedLink.responseCode
+                        link.dead, link.responseCode
                 );
             }
         } catch (IOException e) {

@@ -35,7 +35,7 @@
         <junit.jupiter.version>5.1.1</junit.jupiter.version>
         <hamcrest.junit.version>2.0.0.0</hamcrest.junit.version>
         <!-- Other dependencies -->
-        <util.version>3.0.2</util.version>
+        <util.version>3.0.5</util.version>
         <commons-cli.version>1.4</commons-cli.version>
         <commons-csv.version>1.5</commons-csv.version>
         <gson.version>2.8.4</gson.version>
