@@ -53,33 +53,39 @@ public class ValidateLinks {
             e.printStackTrace();
         }
 
+        // read chunk size
+        int chunkSize = Integer.parseInt(properties.getProperty("chunk-size"));
+
         // read and validate unique links
         logger.info("Reading unique links...");
         List<Link> links = Link.readFromCSV(uniqueLinksPath);
         logger.info(links.size() + " unique links read.");
 
-        logger.info("Validating unique links...");
+        logger.info("Splitting links in chunks of " + chunkSize + " links...");
+        for (int i = 0; i < links.size(); i+=chunkSize) {
+            List<Link> currentChunk = links.subList(i, Math.min(i+chunkSize, links.size()));
 
-        for (int i = 0; i < links.size(); i++) {
-            Link link = links.get(i);
+            logger.info("Validating unique links in chunk starting with " + i + "...");
+            for (int j = 0; i < currentChunk.size(); i++) {
+                Link link = currentChunk.get(i);
 
-            // Locale.ROOT -> force '.' as decimal separator
-            String progress = String.format(Locale.ROOT, "%.2f%%", (((double)(i+1))/links.size()*100));
-            logger.info("Validating unique link " + (i+1) + " of " + links.size() + " (" + progress + ")");
+                // Locale.ROOT -> force '.' as decimal separator
+                String progress = String.format(Locale.ROOT, "%.2f%%", (((double)(i+1))/currentChunk.size()*100));
+                logger.info("Validating unique link " + (i+1) + " of " + currentChunk.size() + " (" + progress + ")");
 
-            if (link.checkIfDead(true, properties)) {
-                // link is dead
-                deadCount++;
+                if (link.checkIfDead(true, properties)) {
+                    // link is dead
+                    deadCount++;
+                }
             }
-        }
 
-        writeLinks(links, outputDirPath);
+            writeLinks(currentChunk, i, outputDirPath);
+        }
     }
 
-    private static void writeLinks(List<Link> links, Path outputDirPath) {
+    private static void writeLinks(List<Link> links, int chunkStart, Path outputDirPath) {
         logger.info(deadCount + " unique links were dead.");
         logger.info("Writing validated unique links to CSV file " + outputDirPath.toFile().getName() + " ...");
-        Link.writeToCSV(links, outputDirPath);
+        Link.writeToCSV(links, chunkStart, outputDirPath);
     }
-
 }

@@ -80,20 +80,20 @@ class ValidationTest {
 
     @Test
     void testResultListConstructor() {
-        Link link_url = new Link("http://bit.ly/unipain");
-        link_url.setDead(false);
-        link_url.setResponseCode("301");
+        Link link_only_url = new Link("http://bit.ly/unipain");
+        link_only_url.setDead(false);
+        link_only_url.setResponseCode("301");
 
-        Link link = new Link(link_url.getProtocol(), link_url.getRootDomain(), link_url.getCompleteDomain(),
-                link_url.getPath(), link_url.getUrl(), link_url.isDead(), link_url.getResponseCode()
+        Link link_complete = new Link(link_only_url.getProtocol(), link_only_url.getRootDomain(), link_only_url.getCompleteDomain(),
+                link_only_url.getPath(), link_only_url.getUrl(), link_only_url.isDead(), link_only_url.getResponseCode()
         );
 
-        assertEquals(link_url.getProtocol(), link.getProtocol());
-        assertEquals(link_url.getRootDomain(), link.getRootDomain());
-        assertEquals(link_url.getCompleteDomain(), link.getCompleteDomain());
-        assertEquals(link_url.getPath(), link.getPath());
-        assertEquals(link_url.getUrl(), link.getUrl());
-        assertEquals(link_url.isDead(), link.isDead());
-        assertEquals(link_url.getResponseCode(), link.getResponseCode());
+        assertEquals(link_only_url.getProtocol(), link_complete.getProtocol());
+        assertEquals(link_only_url.getRootDomain(), link_complete.getRootDomain());
+        assertEquals(link_only_url.getCompleteDomain(), link_complete.getCompleteDomain());
+        assertEquals(link_only_url.getPath(), link_complete.getPath());
+        assertEquals(link_only_url.getUrl(), link_complete.getUrl());
+        assertEquals(link_only_url.isDead(), link_complete.isDead());
+        assertEquals(link_only_url.getResponseCode(), link_complete.getResponseCode());
     }
 }
