@@ -242,7 +242,7 @@ public class Link {
     }
 
     public static void writeToCSV(List<Link> links, int chunkStart, Path outputDir) {
-        File outputFile = Paths.get(outputDir.toString(), "ValidatedLinks_", + (chunkStart+1) + ".csv").toFile();
+        File outputFile = Paths.get(outputDir.toString(), "ValidatedLinks_" + (chunkStart+1) + ".csv").toFile();
         try {
             FileUtils.ensureDirectoryExists(outputDir);
             FileUtils.deleteFileIfExists(outputFile.toPath());
