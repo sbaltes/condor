@@ -65,7 +65,7 @@ public class ValidateLinks {
         for (int i = 0; i < links.size(); i+=chunkSize) {
             List<Link> currentChunk = links.subList(i, Math.min(i+chunkSize, links.size()));
 
-            logger.info("Validating unique links in chunk starting with " + i + "...");
+            logger.info("Validating unique links in chunk starting with link " + (i+1) + "...");
             for (int j = 0; i < currentChunk.size(); i++) {
                 Link link = currentChunk.get(i);
 
