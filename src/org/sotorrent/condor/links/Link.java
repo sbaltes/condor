@@ -171,7 +171,8 @@ public class Link {
             return true;
         }
 
-        int requestTimeout = Integer.parseInt(properties.getProperty("request-timeout"));
+        int connectTimeout = Integer.parseInt(properties.getProperty("connect-timeout"));
+        int readTimeout = Integer.parseInt(properties.getProperty("read-timeout"));
 
         HttpURLConnection conn = null;
         boolean executeGetRequest = false; // try HEAD request first, if that fails try GET request
@@ -179,7 +180,7 @@ public class Link {
         wait(properties);  // wait between requests
         try {
             // try HEAD request first
-            conn = HttpUtils.openHttpConnection(this.url, "HEAD", followRedirects, requestTimeout);
+            conn = HttpUtils.openHttpConnection(this.url, "HEAD", followRedirects, connectTimeout, readTimeout);
             this.responseCode = Integer.toString(conn.getResponseCode());
             if (!HttpUtils.success(conn) && !HttpUtils.redirect(conn)) {
                 executeGetRequest = true;
@@ -192,7 +193,7 @@ public class Link {
             wait(properties);  // wait between requests
             try {
                 // if HEAD request fails, try a GET request
-                conn = HttpUtils.openHttpConnection(this.url, "GET", followRedirects, requestTimeout);
+                conn = HttpUtils.openHttpConnection(this.url, "GET", followRedirects, connectTimeout, readTimeout);
                 this.responseCode = Integer.toString(conn.getResponseCode());
             } catch (IOException e) {
                 this.responseCode = e.getClass().getSimpleName();

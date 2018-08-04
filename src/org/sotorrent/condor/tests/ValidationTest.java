@@ -96,4 +96,11 @@ class ValidationTest {
         assertEquals(link_only_url.isDead(), link_complete.isDead());
         assertEquals(link_only_url.getResponseCode(), link_complete.getResponseCode());
     }
+
+    @Test
+    void testConnectionFreeze() {
+        // this URL blocked the connection before we set the read timeout
+        Link link = new Link("http://www.cashsheet.com/api/upload");
+        assertTrue(link.checkIfDead(true, properties));
+    }
 }
