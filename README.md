@@ -12,11 +12,11 @@ using a heuristic based on domains and paths.
 
 Windows:
 
-    mvn exec:java -D"exec.mainClass"="org.sotorrent.condor.MatchDeveloperResources" -D"exec.args"="-p data-collection/data/java_regex/Posts_validated.csv -c data-collection/data/java_regex/Comments.csv -o data-collection/output"
+    mvn exec:java -D"exec.mainClass"="org.sotorrent.condor.MatchDeveloperResources" -D"exec.args"="-p data-collection/data/java_regex/Posts_validated.csv -c data-collection/data/java_regex/Comments_validated.csv -o data-collection/java_regex"
 
 Linux/macOS:
 
-    mvn exec:java -Dexec.mainClass="org.sotorrent.condor.MatchDeveloperResources" -Dexec.args="-p data-collection/data/java_regex/Posts_validated.csv -c data-collection/data/java_regex/Comments.csv -o data-collection/output" output.log 2>&1
+    mvn exec:java -Dexec.mainClass="org.sotorrent.condor.MatchDeveloperResources" -Dexec.args="-p data-collection/data/java_regex/Posts_validated.csv -c data-collection/data/java_regex/Comments_validated.csv -o data-collection/java_regex" output.log 2>&1
 
 #### Parameters
 
@@ -46,3 +46,19 @@ Linux/macOS:
 
 To re-validate a result list (`ValidatedLinks.csv`), pass it using the `-u` parameters. The tool detects the result
 list and only re-validates links with a 429 response code (too many requests).
+
+#### Execute progress check from console
+
+    mvn clean install
+
+Windows:
+
+    mvn exec:java -D"exec.mainClass"="org.sotorrent.condor.CheckProgress" -D"exec.args"="-p java_regex"
+
+Linux/macOS:
+
+    mvn exec:java -Dexec.mainClass="org.sotorrent.condor.CheckProgress" -Dexec.args="-p java_regex" > output.log 2>&1
+
+#### Parameters
+
+`-p` Prefix for sample to check.

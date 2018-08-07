@@ -1,5 +1,6 @@
 package org.sotorrent.condor;
 
+import org.apache.commons.cli.*;
 import org.sotorrent.condor.links.CommentLink;
 import org.sotorrent.condor.links.Link;
 import org.sotorrent.condor.links.PostLink;
@@ -13,10 +14,31 @@ import java.util.stream.Collectors;
 import static org.sotorrent.condor.MatchDeveloperResources.logger;
 
 public class CheckProgress {
-	private static final Path COMMENTS = Paths.get("data-collection/output/", CommentLink.FILENAME );
-	private static final Path POSTS = Paths.get("data-collection/output/", PostLink.FILENAME);
-	
 	public static void main(String[] args) {
+        Options options = new Options();
+
+        Option prefixOption = new Option("p", "prefix", true,
+                "prefix for sample to check");
+        prefixOption.setRequired(true);
+        options.addOption(prefixOption);
+
+        CommandLineParser commandLineParser = new DefaultParser();
+        HelpFormatter commandLineFormatter = new HelpFormatter();
+        CommandLine commandLine;
+
+        try {
+            commandLine = commandLineParser.parse(options, args);
+        } catch (ParseException e) {
+            System.out.println(e.getMessage());
+            commandLineFormatter.printHelp("CheckProgress", options);
+            System.exit(1);
+            return;
+        }
+
+        final String PREFIX = commandLine.getOptionValue("prefix");
+        final Path COMMENTS = Paths.get("data-collection/data/", PREFIX, CommentLink.FILENAME);
+        final Path POSTS = Paths.get("data-collection/data/", PREFIX, PostLink.FILENAME);
+
 	    Map<String, Integer> progress = Link.checkProgress(COMMENTS, POSTS);
 		int matched = progress.get("matched");
 		int total = progress.get("total");
