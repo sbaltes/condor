@@ -12,11 +12,11 @@ using a heuristic based on domains and paths.
 
 Windows:
 
-    mvn exec:java -D"exec.mainClass"="org.sotorrent.condor.MatchDeveloperResources" -D"exec.args"="-p data-collection/data/java_regex/Posts_validated.csv -c data-collection/data/java_regex/Comments_validated.csv -o data-collection/java_regex"
+    mvn exec:java -D"exec.mainClass"="org.sotorrent.condor.MatchDeveloperResources" -D"exec.args"="-p data-collection/data/java_regex/Posts_validated.csv -c data-collection/data/java_regex/Comments_validated.csv -o data-collection/data/java_regex"
 
 Linux/macOS:
 
-    mvn exec:java -Dexec.mainClass="org.sotorrent.condor.MatchDeveloperResources" -Dexec.args="-p data-collection/data/java_regex/Posts_validated.csv -c data-collection/data/java_regex/Comments_validated.csv -o data-collection/java_regex" output.log 2>&1
+    mvn exec:java -Dexec.mainClass="org.sotorrent.condor.MatchDeveloperResources" -Dexec.args="-p data-collection/data/java_regex/Posts_validated.csv -c data-collection/data/java_regex/Comments_validated.csv -o data-collection/data/java_regex" output.log 2>&1
 
 #### Parameters
 
