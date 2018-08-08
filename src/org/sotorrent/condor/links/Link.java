@@ -125,10 +125,10 @@ public class Link {
         if (!urlMatcher.find()) {
             throw new IllegalArgumentException("Malformed URL: " + url);
         }
-        this.url = urlMatcher.group(0).toLowerCase();
-        this.protocol = Patterns.extractProtocolFromUrl(this.url);
-        this.completeDomain = Patterns.extractCompleteDomainFromUrl(this.url);
-        this.rootDomain = Patterns.extractRootDomainFromCompleteDomain(completeDomain);
+        this.url = urlMatcher.group(0);
+        this.protocol = Patterns.extractProtocolFromUrl(this.url).toLowerCase();
+        this.completeDomain = Patterns.extractCompleteDomainFromUrl(this.url).toLowerCase();
+        this.rootDomain = Patterns.extractRootDomainFromCompleteDomain(completeDomain).toLowerCase();
         this.path = Patterns.extractPathFromUrl(this.url);
     }
 
