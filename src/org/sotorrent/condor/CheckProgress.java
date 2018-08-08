@@ -6,36 +6,27 @@ import org.sotorrent.condor.links.Link;
 import org.sotorrent.condor.links.PostLink;
 import org.sotorrent.condor.resources.DeveloperResource;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
+import java.util.Properties;
 import java.util.stream.Collectors;
 
 import static org.sotorrent.condor.MatchDeveloperResources.logger;
 
 public class CheckProgress {
 	public static void main(String[] args) {
-        Options options = new Options();
-
-        Option prefixOption = new Option("p", "prefix", true,
-                "prefix for sample to check");
-        prefixOption.setRequired(true);
-        options.addOption(prefixOption);
-
-        CommandLineParser commandLineParser = new DefaultParser();
-        HelpFormatter commandLineFormatter = new HelpFormatter();
-        CommandLine commandLine;
-
+        // read properties
+        final Properties properties = new Properties();
         try {
-            commandLine = commandLineParser.parse(options, args);
-        } catch (ParseException e) {
-            System.out.println(e.getMessage());
-            commandLineFormatter.printHelp("CheckProgress", options);
-            System.exit(1);
-            return;
+                properties.load(new FileInputStream("condor.properties"));
+        } catch (IOException e) {
+                e.printStackTrace();
         }
+        final String PREFIX = properties.getProperty("sample");
 
-        final String PREFIX = commandLine.getOptionValue("prefix");
         final Path COMMENTS = Paths.get("data-collection/data/", PREFIX, CommentLink.FILENAME);
         final Path POSTS = Paths.get("data-collection/data/", PREFIX, PostLink.FILENAME);
 

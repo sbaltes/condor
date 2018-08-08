@@ -1,24 +1,23 @@
 package org.sotorrent.condor;
 
 import org.sotorrent.util.LogUtils;
-import org.apache.commons.cli.*;
 import org.sotorrent.condor.links.CommentLink;
 import org.sotorrent.condor.links.Link;
 import org.sotorrent.condor.links.PostLink;
 import org.sotorrent.condor.resources.DeveloperResource;
 import org.sotorrent.condor.resources.NotMatched;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Locale;
+import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Logger;
 
 public class MatchDeveloperResources {
-    //TODO: move command-line paramters to properties file?
-
     public static Logger logger = null;
     static {
         // configure logger
@@ -30,39 +29,17 @@ public class MatchDeveloperResources {
     }
 
     public static void main (String[] args) {
-        Options options = new Options();
-
-        Option postLinksOption = new Option("p", "post-links", true,
-                "path to CSV file with post links");
-        postLinksOption.setRequired(true);
-        options.addOption(postLinksOption);
-
-        Option commentLinksOption = new Option("c", "comment-links", true,
-                "path to CSV file with comment links");
-        commentLinksOption.setRequired(true);
-        options.addOption(commentLinksOption);
-
-        Option outputDirOption = new Option("o", "output-dir", true,
-                "path to output directory (used to store CSV files with classified links");
-        outputDirOption.setRequired(true);
-        options.addOption(outputDirOption);
-
-        CommandLineParser commandLineParser = new DefaultParser();
-        HelpFormatter commandLineFormatter = new HelpFormatter();
-        CommandLine commandLine;
-
+        // read properties
+        final Properties properties = new Properties();
         try {
-            commandLine = commandLineParser.parse(options, args);
-        } catch (ParseException e) {
-            System.out.println(e.getMessage());
-            commandLineFormatter.printHelp("MatchDeveloperResources", options);
-            System.exit(1);
-            return;
+            properties.load(new FileInputStream("condor.properties"));
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-
-        Path postLinksPath = Paths.get(commandLine.getOptionValue("post-links"));
-        Path commentLinksPath = Paths.get(commandLine.getOptionValue("comment-links"));
-        Path outputDirPath = Paths.get(commandLine.getOptionValue("output-dir"));
+        final String PREFIX = properties.getProperty("sample");
+        final Path postLinksPath = Paths.get("data-collection", "data", PREFIX, PostLink.FILENAME);
+        final Path commentLinksPath = Paths.get("data-collection", "data", PREFIX, CommentLink.FILENAME);
+        final Path outputDirPath = Paths.get("data-collection", "data", PREFIX);
 
         Set<DeveloperResource> developerResources = DeveloperResource.createDeveloperResources();
         NotMatched notMatched = new NotMatched(developerResources);

@@ -19,15 +19,10 @@ public class ValidateLinks {
     public static void main (String[] args) {
         Options options = new Options();
 
-        Option postLinksOption = new Option("u", "unique-links", true,
-                "path to CSV file with unique links");
-        postLinksOption.setRequired(true);
+        Option postLinksOption = new Option("r", "re-validation", true,
+                "boolean flag to enable re-validation of links");
+        postLinksOption.setRequired(false);
         options.addOption(postLinksOption);
-
-        Option outputDirOption = new Option("o", "output-dir", true,
-                "path to output directory (used to store CSV files with resolved shortened links");
-        outputDirOption.setRequired(true);
-        options.addOption(outputDirOption);
 
         CommandLineParser commandLineParser = new DefaultParser();
         HelpFormatter commandLineFormatter = new HelpFormatter();
@@ -42,8 +37,7 @@ public class ValidateLinks {
             return;
         }
 
-        Path uniqueLinksPath = Paths.get(commandLine.getOptionValue("unique-links"));
-        Path outputDirPath = Paths.get(commandLine.getOptionValue("output-dir"));
+        boolean reValidation = commandLine.hasOption("re-validation");
 
         // read properties
         final Properties properties = new Properties();
@@ -51,6 +45,15 @@ public class ValidateLinks {
             properties.load(new FileInputStream("condor.properties"));
         } catch (IOException e) {
             e.printStackTrace();
+        }
+        final String PREFIX = properties.getProperty("sample");
+        final Path outputDirPath = Paths.get("data-collection", "data", PREFIX);
+        final Path uniqueLinksPath;
+
+        if (reValidation) {
+            uniqueLinksPath = Paths.get("data-collection", "data", PREFIX, "ValidatedLinks.csv");
+        } else {
+            uniqueLinksPath = Paths.get("data-collection", "data", PREFIX, "unique_links.csv");
         }
 
         // read and validate unique links
