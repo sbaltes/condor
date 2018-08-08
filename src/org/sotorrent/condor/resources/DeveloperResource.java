@@ -80,7 +80,9 @@ abstract public class DeveloperResource
                 new OtherAPI(),
                 new OtherReference(),
                 new OtherForum(),
-                new NotDocumentation()
+                new NotDocumentation(),
+                new AndroidAPI(),
+                new AndroidReference()
         );
     }
 
