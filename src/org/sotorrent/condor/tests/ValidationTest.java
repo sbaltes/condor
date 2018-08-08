@@ -103,4 +103,10 @@ class ValidationTest {
         Link link = new Link("http://www.cashsheet.com/api/upload");
         assertTrue(link.checkIfDead(true, properties));
     }
+
+    @Test
+    void testPreservePathCapitalization() {
+        Link link = new Link("http://developer.android.com/reference/android/accounts/AccountManager.html");
+        assertEquals("reference/android/accounts/AccountManager.html", link.getPath());
+    }
 }
