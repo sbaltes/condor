@@ -83,7 +83,8 @@ abstract public class DeveloperResource
                 new NotDocumentation(),
                 new AndroidAPI(),
                 new AndroidReference(),
-                new Youtube()
+                new Youtube(),
+                new AndroidIssue()
         );
     }
 

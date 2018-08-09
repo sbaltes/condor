@@ -14,7 +14,6 @@ public class AndroidReference extends DeveloperResource
                 "^https?://(www\\.)?(d(eveloper)?\\.)?android\\.com(/intl/[^/]+)?(/ndk)?(?!.*(/reference/|/google/)).*",
                 "^https?://(www\\.)?(s(ource)?\\.)?android.com(/intl/[^/]+)?(?!(/reference/|/google/)).*",
                 "^https?://(www\\.)?(tools\\.)?android.com.*",
-                "^https?://(www\\.)?code\\.google\\.com/p/android/issues/.*",
                 "^https?://(www\\.)?developers\\.google\\.com.*/android/.*",
                 "^https?://firebase\\.google.com/docs.*/android/.*"
         });
