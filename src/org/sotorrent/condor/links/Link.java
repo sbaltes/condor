@@ -1,6 +1,5 @@
 package org.sotorrent.condor.links;
 
-import com.google.gson.JsonParser;
 import org.apache.commons.csv.*;
 import org.sotorrent.condor.resources.DeveloperResource;
 import org.sotorrent.util.FileUtils;
@@ -13,7 +12,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.regex.Matcher;
-import java.util.stream.Collectors;
 
 import static org.sotorrent.condor.MatchDeveloperResources.logger;
 import static org.sotorrent.condor.links.CommentLink.csvFormatClassifiedCommentLink;
@@ -125,10 +123,10 @@ public class Link {
         if (!urlMatcher.find()) {
             throw new IllegalArgumentException("Malformed URL: " + url);
         }
-        this.url = urlMatcher.group(0);
+        this.url = Patterns.cleanUrl(urlMatcher.group(0));
         this.protocol = Patterns.extractProtocolFromUrl(this.url).toLowerCase();
         this.completeDomain = Patterns.extractCompleteDomainFromUrl(this.url).toLowerCase();
-        this.rootDomain = Patterns.extractRootDomainFromCompleteDomain(completeDomain).toLowerCase();
+        this.rootDomain = Patterns.extractRootDomainFromCompleteDomain(this.completeDomain).toLowerCase();
         this.path = Patterns.extractPathFromUrl(this.url);
     }
 
