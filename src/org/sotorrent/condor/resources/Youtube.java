@@ -9,7 +9,7 @@ public class Youtube extends DeveloperResource
     {
     	super("youtube.com", "youtu.be");
         createResourcePattern(new String[]{
-                "^https?://(www\\.)?(m\\.)?youtube\\.com/watch/.+",
+                "^https?://(www\\.)?(m\\.)?youtube\\.com/watch.+",
                 "^https?://(www\\.)?(m\\.)?youtu\\.be/.+"
         });
     }
