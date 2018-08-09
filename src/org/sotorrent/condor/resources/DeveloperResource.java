@@ -82,7 +82,8 @@ abstract public class DeveloperResource
                 new OtherForum(),
                 new NotDocumentation(),
                 new AndroidAPI(),
-                new AndroidReference()
+                new AndroidReference(),
+                new Youtube()
         );
     }
 

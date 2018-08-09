@@ -8,7 +8,7 @@ public class NotDocumentation extends DeveloperResource
     NotDocumentation()
     {
     	super("regex101.com", "ideone.com", "imgur.com", "regexr.com", "regexplanet.com", "rubular.com",
-                "debuggex.com", "stackexchange.com", "regexpal.com", "gskinner.com");
+                "debuggex.com", "stackexchange.com", "regexpal.com", "gskinner.com", "pastebin.com", "grepcode.com");
         createResourcePattern(new String[]{
                 ".*"
         });

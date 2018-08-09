@@ -24,7 +24,8 @@ public class JavaReference extends DeveloperResource
                 "^https?://java\\.sun\\.com/products/.+/(docs|articles)(?!.*\\/api).*",
                 "^https?://(www\\.)?oracle\\.com(/technetwork)?/(articles|java)?(?!.*\\/api).*",
                 "^https?://download\\.oracle\\.com/(otn)?(docs|-pub)(?!.*\\/api).*",
-                "^https?://blogs\\.oracle\\.com.*"
+                "^https?://blogs\\.oracle\\.com.*",
+                "^https?://community\\.oracle\\.com/blogs/.*"
         });
     }
 }

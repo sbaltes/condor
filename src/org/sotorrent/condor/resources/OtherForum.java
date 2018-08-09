@@ -7,10 +7,12 @@ public class OtherForum extends DeveloperResource
 {
     OtherForum()
     {
-        super("oracle.com", "sun.com");
+        super("oracle.com", "sun.com", "google.com");
 
         createResourcePattern(new String[]{
-                "^https?://forums\\.(oracle|sun)\\.com.*"
+                "^https?://(www\\.)?forums\\.(oracle|sun)\\.com.*",
+                "^https?://(www\\.)?community\\.oracle\\.com/thread/.*",
+                "^https?://(www\\.)?groups\\.google\\.com/.*"
         });
     }
 }
