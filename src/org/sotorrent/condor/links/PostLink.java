@@ -90,8 +90,10 @@ public class PostLink extends Link {
             for (Link link : postLinks) {
                 PostLink postLink = (PostLink) link;
                 csvPrinter.printRecord(postLink.postId, postLink.postTypeId, postLink.postHistoryId,
-                        postLink.protocol, postLink.rootDomain, postLink.completeDomain,
-                        postLink.path, postLink.url, postLink.dead, postLink.matchedDeveloperResource
+                        postLink.getUrlObject().getProtocol(), postLink.getUrlObject().getRootDomain(),
+                        postLink.getUrlObject().getCompleteDomain(), postLink.getUrlObject().getPath(),
+                        postLink.getUrlObject().getUrlString(),
+                        postLink.dead, postLink.matchedDeveloperResource
                 );
             }
         } catch (IOException e) {

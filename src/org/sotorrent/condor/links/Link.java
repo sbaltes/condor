@@ -4,7 +4,7 @@ import org.apache.commons.csv.*;
 import org.sotorrent.condor.resources.DeveloperResource;
 import org.sotorrent.util.FileUtils;
 import org.sotorrent.util.HttpUtils;
-import org.sotorrent.util.Patterns;
+import org.sotorrent.util.URL;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -57,11 +57,7 @@ public class Link {
         deadRootDomains.add("ccil.org");
     }
 
-    String url;
-    String protocol;
-    String rootDomain;
-    String completeDomain;
-    String path;
+    private URL urlObject;
 
     DeveloperResource matchedDeveloperResource;
 
@@ -69,41 +65,20 @@ public class Link {
     private String responseCode;
 
     public Link(String url) {
+        setUrl(url);
         this.matchedDeveloperResource = null;
         this.dead = false;
         this.responseCode = "-1";
-        setUrl(url);
     }
 
-    public Link(String protocol, String rootDomain, String completeDomain, String path, String url,
-                boolean dead, String responseCode) {
-        this.protocol = protocol;
-        this.rootDomain = rootDomain;
-        this.completeDomain = completeDomain;
-        this.path = path;
-        this.url = url;
+    public Link(String url, boolean dead, String responseCode) {
+        setUrl(url);
         this.dead = dead;
         this.responseCode = responseCode;
     }
 
-    public String getProtocol() {
-        return protocol;
-    }
-
-    public String getRootDomain() {
-        return rootDomain;
-    }
-
-    public String getCompleteDomain() {
-        return completeDomain;
-    }
-
-    public String getPath() {
-        return path;
-    }
-
-    public String getUrl() {
-        return url;
+    public URL getUrlObject() {
+        return urlObject;
     }
 
     public DeveloperResource getMatchedDeveloperResource() {
@@ -119,15 +94,11 @@ public class Link {
     }
 
     public void setUrl(String url) {
-        Matcher urlMatcher = Patterns.url.matcher(url);
+        Matcher urlMatcher = URL.urlPattern.matcher(url);
         if (!urlMatcher.find()) {
             throw new IllegalArgumentException("Malformed URL: " + url);
         }
-        this.url = Patterns.cleanUrl(urlMatcher.group(0));
-        this.protocol = Patterns.extractProtocolFromUrl(this.url).toLowerCase();
-        this.completeDomain = Patterns.extractCompleteDomainFromUrl(this.url).toLowerCase();
-        this.rootDomain = Patterns.extractRootDomainFromCompleteDomain(this.completeDomain).toLowerCase();
-        this.path = Patterns.extractPathFromUrl(this.url);
+        this.urlObject = new URL(url);
     }
 
     public void setMatchedDeveloperResource(DeveloperResource matchedDeveloperResource) {
@@ -157,13 +128,13 @@ public class Link {
             return false;
         }
 
-        if (deadRootDomains.contains(rootDomain)) {
+        if (deadRootDomains.contains(urlObject.getRootDomain())) {
             this.dead = true;
             this.responseCode = "DeadRootDomain";
             return true;
         }
 
-        if (Patterns.isIpAddress(this.url)) {
+        if (this.urlObject.isIpAddress()) {
             this.dead = true;
             this.responseCode = "IPAddress";
             return true;
@@ -178,7 +149,7 @@ public class Link {
         wait(properties);  // wait between requests
         try {
             // try HEAD request first
-            conn = HttpUtils.openHttpConnection(this.url, "HEAD", followRedirects, connectTimeout, readTimeout);
+            conn = HttpUtils.openHttpConnection(this.urlObject.getUrlString(), "HEAD", followRedirects, connectTimeout, readTimeout);
             this.responseCode = Integer.toString(conn.getResponseCode());
             if (!HttpUtils.success(conn) && !HttpUtils.redirect(conn)) {
                 executeGetRequest = true;
@@ -191,7 +162,7 @@ public class Link {
             wait(properties);  // wait between requests
             try {
                 // if HEAD request fails, try a GET request
-                conn = HttpUtils.openHttpConnection(this.url, "GET", followRedirects, connectTimeout, readTimeout);
+                conn = HttpUtils.openHttpConnection(this.urlObject.getUrlString(), "GET", followRedirects, connectTimeout, readTimeout);
                 this.responseCode = Integer.toString(conn.getResponseCode());
             } catch (IOException e) {
                 this.responseCode = e.getClass().getSimpleName();
@@ -221,15 +192,11 @@ public class Link {
                 } else if (currentRecord.size() == 11) {
                     // already processed URLs
                     onlyProcessRateLimitFailures = true;
-                    String protocol = currentRecord.get("Protocol");
-                    String rootDomain = currentRecord.get("RootDomain");
-                    String completeDomain = currentRecord.get("CompleteDomain");
-                    String path = currentRecord.get("Path");
                     String url = currentRecord.get("Url");
                     boolean dead = Boolean.valueOf(currentRecord.get("Dead"));
                     String responseCode = currentRecord.get("ResponseCode");
                     String resolvedUrlResponseCode = currentRecord.get("ResolvedUrlResponseCode");
-                    links.add(new Link(protocol, rootDomain, completeDomain, path, url, dead, responseCode));
+                    links.add(new Link(url, dead, responseCode));
                 }
 
             }
@@ -253,7 +220,8 @@ public class Link {
             // header is automatically written
             for (Link link : links) {
                 csvPrinter.printRecord(
-                        link.protocol, link.rootDomain, link.completeDomain, link.path, link.url,
+                        link.urlObject.getProtocol(), link.urlObject.getRootDomain(), link.urlObject.getCompleteDomain(),
+                        link.urlObject.getPath(), link.getUrlObject().getUrlString(),
                         link.dead, link.responseCode
                 );
             }

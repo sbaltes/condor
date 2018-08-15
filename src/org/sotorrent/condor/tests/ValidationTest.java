@@ -79,25 +79,6 @@ class ValidationTest {
     }
 
     @Test
-    void testResultListConstructor() {
-        Link link_only_url = new Link("http://bit.ly/unipain");
-        link_only_url.setDead(false);
-        link_only_url.setResponseCode("301");
-
-        Link link_complete = new Link(link_only_url.getProtocol(), link_only_url.getRootDomain(), link_only_url.getCompleteDomain(),
-                link_only_url.getPath(), link_only_url.getUrl(), link_only_url.isDead(), link_only_url.getResponseCode()
-        );
-
-        assertEquals(link_only_url.getProtocol(), link_complete.getProtocol());
-        assertEquals(link_only_url.getRootDomain(), link_complete.getRootDomain());
-        assertEquals(link_only_url.getCompleteDomain(), link_complete.getCompleteDomain());
-        assertEquals(link_only_url.getPath(), link_complete.getPath());
-        assertEquals(link_only_url.getUrl(), link_complete.getUrl());
-        assertEquals(link_only_url.isDead(), link_complete.isDead());
-        assertEquals(link_only_url.getResponseCode(), link_complete.getResponseCode());
-    }
-
-    @Test
     void testConnectionFreeze() {
         // this URL blocked the connection before we set the read timeout
         Link link = new Link("http://www.cashsheet.com/api/upload");
@@ -107,6 +88,6 @@ class ValidationTest {
     @Test
     void testPreservePathCapitalization() {
         Link link = new Link("http://developer.android.com/reference/android/accounts/AccountManager.html");
-        assertEquals("reference/android/accounts/AccountManager.html", link.getPath());
+        assertEquals("reference/android/accounts/AccountManager.html", link.getUrlObject().getPath());
     }
 }

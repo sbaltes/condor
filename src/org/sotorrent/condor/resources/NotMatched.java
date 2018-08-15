@@ -22,7 +22,7 @@ public class NotMatched extends DeveloperResource
     @Override
     public boolean match(Link link) 
     {
-        if(contains(link.getRootDomain())) 
+        if(contains(link.getUrlObject().getRootDomain()))
         {
             link.setMatchedDeveloperResource(this);
             addMatchedLink(link);

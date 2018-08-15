@@ -42,7 +42,7 @@ abstract public class DeveloperResource
     }
 
     public boolean match(Link link) {
-        if (aRootDomains.contains(link.getRootDomain()) && aResourcePattern.matcher(link.getUrl()).find()) {
+        if (aRootDomains.contains(link.getUrlObject().getRootDomain()) && aResourcePattern.matcher(link.getUrlObject().getUrlString()).find()) {
             link.setMatchedDeveloperResource(this);
             aMatchedLinks.add(link);
             return true;

@@ -89,9 +89,10 @@ public class CommentLink extends Link {
             for (Link link : commentLinks) {
                 CommentLink commentLink = (CommentLink) link;
                 csvPrinter.printRecord(commentLink.postId, commentLink.postTypeId, commentLink.commentId,
-                        commentLink.protocol, commentLink.rootDomain, commentLink.completeDomain,
-                        commentLink.path, commentLink.url, commentLink.dead,
-                        commentLink.matchedDeveloperResource
+                        commentLink.getUrlObject().getProtocol(), commentLink.getUrlObject().getRootDomain(),
+                        commentLink.getUrlObject().getCompleteDomain(), commentLink.getUrlObject().getPath(),
+                        commentLink.getUrlObject().getUrlString(),
+                        commentLink.dead, commentLink.matchedDeveloperResource
                 );
             }
         } catch (IOException e) {
