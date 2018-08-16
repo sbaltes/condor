@@ -52,7 +52,7 @@ class ValidationTest {
         assertEquals("DeadRootDomain", deadRootDomainLink.getResponseCode());
 
         // this link produces an UnknownHostException
-        Link unkownHostLink = new Link("http://x.x.x.x");
+        Link unkownHostLink = new Link("http://klajsdjklasjkdfgdkfjgdf.de/");
         unkownHostLink.checkIfDead(true, properties);
         assertEquals("UnknownHostException", unkownHostLink.getResponseCode());
 
@@ -60,22 +60,22 @@ class ValidationTest {
         Link ip = new Link("http://0.0.0.0");
         assertTrue(ip.checkIfDead(true, properties));
         assertTrue(ip.isDead());
-        assertEquals("IPAddress", ip.getResponseCode());
+        assertEquals("-1", ip.getResponseCode());
 
         ip = new Link("http://192.168");
         assertTrue(ip.checkIfDead(true, properties));
         assertTrue(ip.isDead());
-        assertEquals("IPAddress", ip.getResponseCode());
+        assertEquals("-1", ip.getResponseCode());
 
         ip = new Link("http://192.168.1.1");
         assertTrue(ip.checkIfDead(true, properties));
         assertTrue(ip.isDead());
-        assertEquals("IPAddress", ip.getResponseCode());
+        assertEquals("-1", ip.getResponseCode());
 
         ip = new Link("http://10.10.10.10");
         assertTrue(ip.checkIfDead(true, properties));
         assertTrue(ip.isDead());
-        assertEquals("IPAddress", ip.getResponseCode());
+        assertEquals("-1", ip.getResponseCode());
     }
 
     @Test

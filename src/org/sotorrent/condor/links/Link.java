@@ -8,10 +8,10 @@ import org.sotorrent.util.URL;
 
 import java.io.*;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.regex.Matcher;
 
 import static org.sotorrent.condor.MatchDeveloperResources.logger;
 import static org.sotorrent.condor.links.CommentLink.csvFormatClassifiedCommentLink;
@@ -94,11 +94,12 @@ public class Link {
     }
 
     public void setUrl(String url) {
-        Matcher urlMatcher = URL.urlPattern.matcher(url);
-        if (!urlMatcher.find()) {
-            throw new IllegalArgumentException("Malformed URL: " + url);
+        try {
+            this.urlObject = new URL(url);
+        } catch (MalformedURLException e) {
+            logger.info("Malformed URL: " + url);
         }
-        this.urlObject = new URL(url);
+
     }
 
     public void setMatchedDeveloperResource(DeveloperResource matchedDeveloperResource) {
@@ -128,15 +129,15 @@ public class Link {
             return false;
         }
 
-        if (deadRootDomains.contains(urlObject.getRootDomain())) {
+        if (urlObject == null) {
+            // malformed URL
             this.dead = true;
-            this.responseCode = "DeadRootDomain";
             return true;
         }
 
-        if (this.urlObject.isIpAddress()) {
+        if (deadRootDomains.contains(urlObject.getRootDomain())) {
             this.dead = true;
-            this.responseCode = "IPAddress";
+            this.responseCode = "DeadRootDomain";
             return true;
         }
 
