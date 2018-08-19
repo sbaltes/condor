@@ -98,3 +98,5 @@ target/
 #input/*
 output/*
 /paper/icse19-condor.pdf
+/data-collection/data/java_android/QuestionsPostBlocks.csv
+/data-collection/data/java_android/QuestionsPostBlocks.csv.gz
