@@ -15,7 +15,9 @@
         <project.build.sourceDirectory>src</project.build.sourceDirectory>
         <project.build.testSourceDirectory>src/org/sotorrent/condor/tests</project.build.testSourceDirectory>
         <!-- Maven -->
-        <maven.mainclass>org.sotorrent.org.sotorrent.condor.MatchDeveloperResources</maven.mainclass>
+        <maven.mainclass-1>org.sotorrent.condor.MatchDeveloperResources</maven.mainclass-1>
+        <maven.mainclass-2>org.sotorrent.condor.ValidateLinks</maven.mainclass-2>
+        <maven.mainclass-3>org.sotorrent.condor.CheckProgress</maven.mainclass-3>
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.plugin.version>3.7.0</maven.compiler.plugin.version>
@@ -128,7 +130,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>${maven.mainclass}</mainClass>
+                            <mainClass>${maven.mainclass-1}</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -137,23 +139,60 @@
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>${maven.assembly.plugin.version}</version>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>${maven.mainclass}</mainClass>
-                        </manifest>
-                    </archive>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                </configuration>
                 <executions>
                     <execution>
-                        <id>make-assembly</id>
+                        <id>match-developer-resources</id>
                         <phase>package</phase>
                         <goals>
                             <goal>single</goal>
                         </goals>
+                        <configuration>
+                            <finalName>condor-match-developer-resources</finalName>
+                            <archive>
+                                <manifest>
+                                    <mainClass>${maven.mainclass-1}</mainClass>
+                                </manifest>
+                            </archive>
+                            <descriptorRefs>
+                                <descriptorRef>jar-with-dependencies</descriptorRef>
+                            </descriptorRefs>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>validate-links</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>condor-validate-links</finalName>
+                            <archive>
+                                <manifest>
+                                    <mainClass>${maven.mainclass-2}</mainClass>
+                                </manifest>
+                            </archive>
+                            <descriptorRefs>
+                                <descriptorRef>jar-with-dependencies</descriptorRef>
+                            </descriptorRefs>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>check-progress</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>condor-check-progress</finalName>
+                            <archive>
+                                <manifest>
+                                    <mainClass>${maven.mainclass-3}</mainClass>
+                                </manifest>
+                            </archive>
+                            <descriptorRefs>
+                                <descriptorRef>jar-with-dependencies</descriptorRef>
+                            </descriptorRefs>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
