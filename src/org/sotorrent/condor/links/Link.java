@@ -57,6 +57,7 @@ public class Link {
         deadRootDomains.add("ccil.org");
     }
 
+    private String urlString;
     private URL urlObject;
 
     DeveloperResource matchedDeveloperResource;
@@ -94,12 +95,17 @@ public class Link {
     }
 
     public void setUrl(String url) {
+        this.urlString = url;
         try {
             this.urlObject = new URL(url);
         } catch (MalformedURLException e) {
             logger.info("Malformed URL: " + url);
         }
 
+    }
+
+    public String getUrlString() {
+        return urlObject != null ? urlObject.getUrlString() : urlString;
     }
 
     public void setMatchedDeveloperResource(DeveloperResource matchedDeveloperResource) {
@@ -220,11 +226,18 @@ public class Link {
         try (CSVPrinter csvPrinter = new CSVPrinter(new FileWriter(outputFile), csvFormatValidatedUniqueLink)) {
             // header is automatically written
             for (Link link : links) {
-                csvPrinter.printRecord(
-                        link.urlObject.getProtocol(), link.urlObject.getRootDomain(), link.urlObject.getCompleteDomain(),
-                        link.urlObject.getPath(), link.getUrlObject().getUrlString(),
-                        link.dead, link.responseCode
-                );
+                if (link.urlObject == null) {
+                    csvPrinter.printRecord(
+                            "", "", "", "",
+                            link.getUrlString(), link.dead, link.responseCode
+                    );
+                } else {
+                    csvPrinter.printRecord(
+                            link.urlObject.getProtocol(), link.urlObject.getRootDomain(), link.urlObject.getCompleteDomain(),
+                            link.urlObject.getPath(), link.getUrlString(),
+                            link.dead, link.responseCode
+                    );
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
