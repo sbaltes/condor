@@ -23,7 +23,7 @@ public class PostLink extends Link {
     private int postHistoryId;
     private boolean dead;
 
-    public static final String FILENAME = "PostLinks.csv";
+    public static final String FILENAME = "Posts_validated.csv";
     private static CSVFormat csvFormatPostLink;
     static final CSVFormat csvFormatClassifiedPostLink;
     static {

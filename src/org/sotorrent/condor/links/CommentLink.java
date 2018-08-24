@@ -23,7 +23,7 @@ public class CommentLink extends Link {
     private int commentId;
     private boolean dead;
 
-    public static final String FILENAME = "CommentLinks.csv";
+    public static final String FILENAME = "Comments_validated.csv";
     private static final CSVFormat csvFormatCommentLink;
     static final CSVFormat csvFormatClassifiedCommentLink;
     static {
