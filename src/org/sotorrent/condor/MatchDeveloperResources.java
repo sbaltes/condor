@@ -98,6 +98,7 @@ public class MatchDeveloperResources {
     }
 
     private static void logProgress(List<Link> links, int currentPos, int logPace) {
+        logPace = Math.max(1, logPace); // prevent division by zero
         if (currentPos == 0 || currentPos == links.size()-1 || currentPos % logPace == 0) {
             // Locale.ROOT -> force '.' as decimal separator
             String progress = String.format(Locale.ROOT, "%.2f%%", (((double)(currentPos+1))/links.size()*100));

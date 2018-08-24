@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -89,5 +90,12 @@ class ValidationTest {
     void testPreservePathCapitalization() {
         Link link = new Link("http://developer.android.com/reference/android/accounts/AccountManager.html");
         assertEquals("reference/android/accounts/AccountManager.html", link.getUrlObject().getPath());
+    }
+
+    @Test
+    void testMalformedURLException() {
+        // this should not produce a MalformedURLException
+        Link link = new Link("http://stackoverflow.com/questions/43810934/android-killing-background-acitivities/43811128?noredirect=1#");
+        assertNotNull(link.getUrlObject());
     }
 }
