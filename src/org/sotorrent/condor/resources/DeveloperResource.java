@@ -42,13 +42,22 @@ abstract public class DeveloperResource
     }
 
     public boolean match(Link link) {
-        if (aRootDomains.contains(link.getUrlObject().getRootDomain()) && aResourcePattern.matcher(link.getUrlObject().getUrlString()).find()) {
+        if (link.getUrlObject() == null
+                && this instanceof Dead) {
             link.setMatchedDeveloperResource(this);
             aMatchedLinks.add(link);
             return true;
-        } else {
-            return false;
         }
+
+        if (link.getUrlObject() != null
+                && aRootDomains.contains(link.getUrlObject().getRootDomain())
+                && aResourcePattern.matcher(link.getUrlObject().getUrlString()).find()) {
+            link.setMatchedDeveloperResource(this);
+            aMatchedLinks.add(link);
+            return true;
+        }
+
+        return false;
     }
 
     public static boolean match(Link link, Collection<DeveloperResource> developerResources) {

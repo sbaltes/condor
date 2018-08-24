@@ -88,12 +88,20 @@ public class CommentLink extends Link {
             // header is automatically written
             for (Link link : commentLinks) {
                 CommentLink commentLink = (CommentLink) link;
-                csvPrinter.printRecord(commentLink.postId, commentLink.postTypeId, commentLink.commentId,
-                        commentLink.getUrlObject().getProtocol(), commentLink.getUrlObject().getRootDomain(),
-                        commentLink.getUrlObject().getCompleteDomain(), commentLink.getUrlObject().getPath(),
-                        commentLink.getUrlObject().getUrlString(),
-                        commentLink.dead, commentLink.matchedDeveloperResource
-                );
+
+                if (link.getUrlObject() == null) {
+                    csvPrinter.printRecord(commentLink.postId, commentLink.postTypeId, commentLink.commentId,
+                            "", "", "", "",
+                            commentLink.getUrlString(), commentLink.dead, commentLink.matchedDeveloperResource
+                    );
+                } else {
+                    csvPrinter.printRecord(commentLink.postId, commentLink.postTypeId, commentLink.commentId,
+                            commentLink.getUrlObject().getProtocol(), commentLink.getUrlObject().getRootDomain(),
+                            commentLink.getUrlObject().getCompleteDomain(), commentLink.getUrlObject().getPath(),
+                            commentLink.getUrlObject().getUrlString(),
+                            commentLink.dead, commentLink.matchedDeveloperResource
+                    );
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();

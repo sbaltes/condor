@@ -89,12 +89,20 @@ public class PostLink extends Link {
             // header is automatically written
             for (Link link : postLinks) {
                 PostLink postLink = (PostLink) link;
-                csvPrinter.printRecord(postLink.postId, postLink.postTypeId, postLink.postHistoryId,
-                        postLink.getUrlObject().getProtocol(), postLink.getUrlObject().getRootDomain(),
-                        postLink.getUrlObject().getCompleteDomain(), postLink.getUrlObject().getPath(),
-                        postLink.getUrlObject().getUrlString(),
-                        postLink.dead, postLink.matchedDeveloperResource
-                );
+
+                if (postLink.getUrlObject() == null) {
+                    csvPrinter.printRecord(postLink.postId, postLink.postTypeId, postLink.postHistoryId,
+                           "", "", "", "",
+                            postLink.getUrlString(), postLink.dead, postLink.matchedDeveloperResource
+                    );
+                } else {
+                    csvPrinter.printRecord(postLink.postId, postLink.postTypeId, postLink.postHistoryId,
+                            postLink.getUrlObject().getProtocol(), postLink.getUrlObject().getRootDomain(),
+                            postLink.getUrlObject().getCompleteDomain(), postLink.getUrlObject().getPath(),
+                            postLink.getUrlObject().getUrlString(),
+                            postLink.dead, postLink.matchedDeveloperResource
+                    );
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
