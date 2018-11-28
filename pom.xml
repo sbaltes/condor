@@ -58,7 +58,7 @@
     </repositories>
 
     <dependencies>
-        <!-- https://github.com/sotorrent/util/tree/master/releases/ -->
+        <!-- https://github.com/sotorrent/util/tree/ -->
         <dependency>
             <groupId>org.sotorrent</groupId>
             <artifactId>util</artifactId>
