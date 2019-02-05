@@ -1,12 +1,18 @@
 # Condor
-Contextual Documentation Referencing Research Project
 
-# Classification of link targets
-The tool in package `org.sotorrent.condor` extracts links
-from Stack Overflow posts/comments pointing to *developer resources* 
-using a heuristic based on domains and paths.
+**Con**textual **Do**cumentation **R**eferencing on Stack Overflow
 
-#### Execute developer resource matcher from console
+[![logo](doc/logo_transparent_small.png "condor logo")](doc/logo_transparent.png)
+
+<sub>Image sources: [Condor](https://pixabay.com/de/condor-vogel-himmel-tier-fliegen-2332750/), [Stack Overflow](https://en.wikipedia.org/wiki/Stack_Overflow#/media/File:Stack_Overflow_logo.svg), [GitHub](https://de.wikipedia.org/wiki/GitHub#/media/File:GitHub_logo_2013.svg)</sub> 
+
+# Classification of Link Targets
+
+This tool identifies links from Stack Overflow posts/comments pointing to *developer resources* using a heuristic based on domains and paths.
+
+## Execute developer resource matcher from console
+
+The sample name has to be set in the properties file (`condor.properties`), e.g. `sample=java_regex`.
 
     mvn clean install
 
@@ -18,11 +24,9 @@ Linux/macOS:
 
     mvn exec:java -Dexec.mainClass="org.sotorrent.condor.MatchDeveloperResources" output.log 2>&1
 
-#### Parameters
+## Execute link validation from console
 
 The sample name has to be set in the properties file (`condor.properties`), e.g. `sample=java_regex`.
-
-#### Execute link validation from console
 
     mvn clean install
 
@@ -34,16 +38,16 @@ Linux/macOS:
 
     mvn exec:java -Dexec.mainClass="org.sotorrent.condor.ValidateLinks" > output.log 2>&1
 
-#### Parameters
-
-The sample name has to be set in the properties file (`condor.properties`), e.g. `sample=java_regex`.
+### Parameters
 
 `-r` Boolean flag to enable re-validation.
 
 If re-validation is enabled, the tool excepts a file `ValidatedLinks.csv` in the sample directory and only re-validates
 links with a 429 response code (too many requests).
 
-#### Execute progress check from console
+## Execute progress check from console
+
+The sample name has to be set in the properties file (`condor.properties`), e.g. `sample=java_regex`.
 
     mvn clean install
 
@@ -55,6 +59,3 @@ Linux/macOS:
 
     mvn exec:java -Dexec.mainClass="org.sotorrent.condor.CheckProgress" > output.log 2>&1
 
-#### Parameters
-
-The sample name has to be set in the properties file (`condor.properties`), e.g. `sample=java_regex`.
