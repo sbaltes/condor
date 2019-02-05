@@ -4,7 +4,7 @@
 
 [![logo](doc/logo_transparent_small.png "condor logo")](doc/logo_transparent.png)
 
-<sub>Image sources: [Condor](https://pixabay.com/de/condor-vogel-himmel-tier-fliegen-2332750/), [Stack Overflow](https://en.wikipedia.org/wiki/Stack_Overflow#/media/File:Stack_Overflow_logo.svg), [GitHub](https://de.wikipedia.org/wiki/GitHub#/media/File:GitHub_logo_2013.svg)</sub> 
+<sub>Image sources: [Condor](https://pixabay.com/de/condor-vogel-himmel-tier-fliegen-2332750/), [Stack Overflow](https://en.wikipedia.org/wiki/Stack_Overflow#/media/File:Stack_Overflow_logo.svg)</sub> 
 
 # Classification of Link Targets
 
