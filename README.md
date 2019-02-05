@@ -1,8 +1,10 @@
 # Condor
 
+[![logo](doc/logo_transparent_small.png "condor logo")](doc/logo_transparent.png)
+
 **Con**textual **Do**cumentation **R**eferencing on Stack Overflow
 
-[![logo](doc/logo_transparent_small.png "condor logo")](doc/logo_transparent.png)
+[![DOI](https://zenodo.org/badge/169211508.svg)](https://zenodo.org/badge/latestdoi/169211508)
 
 <sub>Image sources: [Condor](https://pixabay.com/de/condor-vogel-himmel-tier-fliegen-2332750/), [Stack Overflow](https://en.wikipedia.org/wiki/Stack_Overflow#/media/File:Stack_Overflow_logo.svg)</sub> 
 
