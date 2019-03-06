@@ -26,8 +26,8 @@ public class CheckProgress {
         }
         final String PREFIX = properties.getProperty("sample");
 
-        final Path COMMENTS = Paths.get("/data/", PREFIX, CommentLink.FILENAME);
-        final Path POSTS = Paths.get("/data/", PREFIX, PostLink.FILENAME);
+        final Path COMMENTS = Paths.get("data/", PREFIX, CommentLink.FILENAME);
+        final Path POSTS = Paths.get("data/", PREFIX, PostLink.FILENAME);
 
 	    Map<String, Integer> progress = Link.checkProgress(COMMENTS, POSTS);
 		int matched = progress.get("matched");
