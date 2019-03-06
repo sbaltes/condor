@@ -47,13 +47,13 @@ public class ValidateLinks {
             e.printStackTrace();
         }
         final String PREFIX = properties.getProperty("sample");
-        final Path outputDirPath = Paths.get("data-collection", "data", PREFIX);
+        final Path outputDirPath = Paths.get("data", PREFIX);
         final Path uniqueLinksPath;
 
         if (reValidation) {
-            uniqueLinksPath = Paths.get("data-collection", "data", PREFIX, "ValidatedLinks.csv");
+            uniqueLinksPath = Paths.get("data", PREFIX, "ValidatedLinks.csv");
         } else {
-            uniqueLinksPath = Paths.get("data-collection", "data", PREFIX, "unique_links.csv");
+            uniqueLinksPath = Paths.get("data", PREFIX, "unique_links.csv");
         }
 
         // read and validate unique links

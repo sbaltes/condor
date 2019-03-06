@@ -4,8 +4,6 @@
 # Log file
 *.log
 *.log.*
-!data-collection/logs/*.log
-
 # BlueJ files
 *.ctxt
 

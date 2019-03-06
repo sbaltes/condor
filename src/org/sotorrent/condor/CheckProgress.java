@@ -1,6 +1,5 @@
 package org.sotorrent.condor;
 
-import org.apache.commons.cli.*;
 import org.sotorrent.condor.links.CommentLink;
 import org.sotorrent.condor.links.Link;
 import org.sotorrent.condor.links.PostLink;
@@ -27,8 +26,8 @@ public class CheckProgress {
         }
         final String PREFIX = properties.getProperty("sample");
 
-        final Path COMMENTS = Paths.get("data-collection/data/", PREFIX, CommentLink.FILENAME);
-        final Path POSTS = Paths.get("data-collection/data/", PREFIX, PostLink.FILENAME);
+        final Path COMMENTS = Paths.get("/data/", PREFIX, CommentLink.FILENAME);
+        final Path POSTS = Paths.get("/data/", PREFIX, PostLink.FILENAME);
 
 	    Map<String, Integer> progress = Link.checkProgress(COMMENTS, POSTS);
 		int matched = progress.get("matched");

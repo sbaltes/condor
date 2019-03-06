@@ -37,9 +37,9 @@ public class MatchDeveloperResources {
             e.printStackTrace();
         }
         final String PREFIX = properties.getProperty("sample");
-        final Path postLinksPath = Paths.get("data-collection", "data", PREFIX, PostLink.FILENAME);
-        final Path commentLinksPath = Paths.get("data-collection", "data", PREFIX, CommentLink.FILENAME);
-        final Path outputDirPath = Paths.get("data-collection", "data", PREFIX);
+        final Path postLinksPath = Paths.get("data", PREFIX, PostLink.FILENAME);
+        final Path commentLinksPath = Paths.get("data", PREFIX, CommentLink.FILENAME);
+        final Path outputDirPath = Paths.get("data", PREFIX);
 
         Set<DeveloperResource> developerResources = DeveloperResource.createDeveloperResources();
         NotMatched notMatched = new NotMatched(developerResources);
