@@ -11,8 +11,7 @@ public class StackOverflow extends DeveloperResource
         super("stackoverflow.com");
 
         createResourcePattern(new String[]{
-                "^https?://((www|pt|ru|es)\\.)?stackoverflow\\.com/(a|q|questions)/[\\d]+",
-                "^https?://((www|pt|ru|es)\\.)?stackoverflow\\.com/questions/[\\d]+/[^\\s/\\#]+",
+                "^https?://((www|pt|ru|es)\\.)?stackoverflow\\.com/(a|q|questions)/[\\d]+(?:/[^\\s/\\#]+)?",
                 "^https?://((www|pt|ru|es)\\.)?stackoverflow\\.com/revisions.*",
                 "^https?://((www|pt|ru|es)\\.)?stackoverflow\\.com/posts/\\d+/revisions.*",
                 "^https?://((www|pt|ru|es)\\.)?stackoverflow\\.com/posts/comments.*"
