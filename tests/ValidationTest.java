@@ -27,7 +27,7 @@ class ValidationTest {
     @Test
     void testCheckIfDead() {
         // check valid http link
-        Link validHttpLink = new Link("http://dblp.uni-trier.de/");
+        Link validHttpLink = new Link("http://weingut-baltes.de/");
         assertFalse(validHttpLink.checkIfDead(true, properties));
 
         // check valid https link
@@ -42,10 +42,10 @@ class ValidationTest {
         Link deadLink = new Link("http://fiddle.re/26pu");
         assertTrue(deadLink.checkIfDead(true, properties));
 
-        // this link produces a SSLHandshakeException
-        Link sslErrorLink = new Link("https://www.debuggex.com/i/u1J8uHpK4CQXNC8e.png");
-        sslErrorLink.checkIfDead(true, properties);
-        assertEquals("SSLHandshakeException", sslErrorLink.getResponseCode());
+        // this link produces a SSLHandshakeException --> now return 200
+//        Link sslErrorLink = new Link("https://www.debuggex.com/i/u1J8uHpK4CQXNC8e.png");
+//        sslErrorLink.checkIfDead(true, properties);
+//        assertEquals("SSLHandshakeException", sslErrorLink.getResponseCode());
 
         // this link has a dead root domain
         Link deadRootDomainLink = new Link("http://fiddle.re/2r7c");
